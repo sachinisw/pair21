@@ -1,0 +1,17 @@
+A \textbf{common prefix} ($\phi$) for plans $\pi_g$ and $\pi\prime_{g\prime}$ for planning problems $P_g$ and $P_{g\prime}$ respectively is a sequence of actions such that $\phi$ is a prefix of $\pi_g$ and $\pi\prime_{g\prime}$. Otherwise $\phi=\emptyset$.
+
+In the multi-agent case, the domain has a user agent $A_d$ and an attacker agent $A_u$. The user solves the planning task $ P_d = \langle F_d, A_d, I_d, G_d \rangle$. The attacker solves the planning task $ P_u = \langle F_u, A_u, I_u, G_u \rangle$. Note that because $\langle F_d, A_d, I_d\rangle \neq \langle F_u, A_u, I_u\rangle$, there can be many relationships between solutions to $P_d$ and $P_u$ ($\pi_d$ and $\pi_u$ respectively). For instance, in our blocks-words domain example, the hidden block gives the attacker additional actions to be used against the user. In this work we assume that $\pi_d$ and $\pi_u$ shares a common prefix $\phi$. However, there are actions $a\in\pi_u$ and $a \notin \phi$, such that if executed will divert the user away from $G_d$ and toward $G_u$. In other words, the attacker can leverage the progress the user had made to further its own goal.
+
+
+
+Since we are using intervention to alert the user we need to minimize false negatives (caused by alerting too late) and false positives (caused by alerting too early) during recognition. We first define the plan intervention problem $\mathcal{I}$ for a multi-agent domain, where two competing agents (user and attacker) operate and later present the spacial case, where the only actor in the domain is a user.
+
+-----
+
+(1) \textbf{Observer}: 
+
+
+(2) \textbf{User}: 
+
+(3) \textbf{Attacker}: 
+

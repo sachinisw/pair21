@@ -1,0 +1,31 @@
+\section{Learning When to Intervene}
+The observer is learning to generate alerts when detecting undesirable states while the user is in a goal-oriented but unsafe path. If the observer naively observed for the undesirable state, it will trigger alerts for both goal-oriented and non-goal oriented states and overwhelm the user (e.g., trying moves in rush hour puzzle). It may be possible to equip planners to produce plans, which avoids the undesirable states while optimizing for metrics like plan length so that the observer can produce ``safe'' plans on user's behalf.
+
+We train a classifier in supervised learning mode to categorize observed actions into two classes: (Y) indicating interruption is warranted and (N), indicating otherwise. According to this policy, in the expanded sub-tree in Figure \ref{fig:feature} the path that reaches $G_u$ is labeled as follows: PICK-UP A (N), STACK A D (N), PICK-UP B (N), STACK B A (Y), PICK-UP T (N). We will make this labeled data set available for the community. Given a labeled observation set and corresponding feature vectors, we train the classifiers with 10-fold cross validation. Then the trained model is used to predict intervention for previously unseen, new intervention problems. We chose attribute selected Naive Bayes, K-nearest neighbors, decision tree and logistic regression classifiers from Weka~\footnote{\url{http://www.cs.waikato.ac.nz/ml/weka/}}. Attribute selected classifiers filter the feature vector to only select critical features. This step reduces complexity of the model, makes the outcome of the model easier to interpret, and reduces over-fitting. To generate training data we first created twenty intervention problems for the benchmark domains and the Rush Hour domain and enforced a limit of 100 observation traces per problem.  
+
+
+
+%While there are many model-agnostic methods for explaining predictions for classifiers (e.g., LIME \cite{ribeiro2016}, Shapely values), for simplicity we opted to adopt commonly used interpretable models to learn when to intervene. Additionally, we want to draw focus toward explaining event causality associated with the undesirable state (i.e., what events caused intervention). Associations learned by the supervised learning algorithms do not reflect event causality.
+
+%For each classifier we select parameters to tune and compared their effect on the model accuracy for both benchmark and Rush Hour domains. For the decision tree, we tuned pruning confidence (C) and minimum number of instances per leaf (M). For the K-nearest neighbor classifier we tune K and the distance metric (dis). Naive Bayes classifier is tuned with the supervised discretization parameter (D). The logistic regression classifier was tuned with the ridge parameter (R). 
+
+A full parameter search revealed the best parameters for the classifiers. The decision tree classifier is tuned to pruning confidence=0.25 and minimum number of instance per leaf=2. K-nearest neighbor classifier is tuned to use k=1 and distance measure=Euclidean. Logistic regression classifier is tuned for ridge parameter = 1.0E-8. Naive Bayes classifier is tuned with the supervised discretization=True. For the exact method, the learned models chose distance to $G_u$ and Risk as the dominant features for the benchmark domains. There was no uniformity in dominant features for the approximate method. We used the Top-K planner (K=50) \cite{riabov2014} to sample the plan space in the approximate method.
+
+%ran experiments using the Weka workbench to evaluate classifier accuracy (dependant variable) to varying parameter for the classifiers (independant variables). Table \ref{tab:tuned} summarizes results, with boldface values indicating the selected parameter values that produced best accuracy (95\% confidence interval) for all the domains.
+
+%\begin{table}[ht]
+%\small
+%\begin{tabular}{|l|l|}
+%\hline
+%\multicolumn{1}{|c|}{Classifier} & \multicolumn{1}{c|}{Tested Values}                                                        \\ \hline
+%Decision tree                    & \begin{tabular}[c]{@{}l@{}}C = {[}0.05,0.1,\textbf{0.25},0.5{]}\\ M = {[}\textbf{2},5,10{]}\end{tabular}    \\ \hline
+%K-nearest neighbor               & \begin{tabular}[c]{@{}l@{}}K = {[}\textbf{1},3,7{]}\\ Dis = {[}\textbf{Eucledean},Manhattan{]}\end{tabular} \\ \hline
+%Naive Bayes                      & D = {[}\textbf{True},False{]}                                                                      \\ \hline
+%Logistic regression              & R = {[}1.0E-2,1.0E-4,\textbf{1.0E-8},1.0E-16{]}                                                    \\ \hline
+%\end{tabular}
+%\caption{Parameter tuning for intervention classifiers}
+%\label{tab:tuned}
+%\end{table}
+% 
+ 
+

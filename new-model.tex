@@ -1,0 +1,61 @@
+We adapt the definition of Ramirez and Geffner \shortcite{ramirez2010probabilistic}, originally used for offline goal recognition, to the problem of online plan intervention.
+In that work, a STRIPS \cite{fikes1971strips} planning problem is a tuple $ P = \langle F, A, I, G \rangle$ where $F$ is the set of fluents, $I\subseteq F$ is the initial state, $G  \subseteq F$ represents the set of goal states and $A$ is the set of actions. 
+Each action $a \in A$ is a triple $a=\langle Pre(a), Add(a), Del(a)\rangle$ that consists of preconditions, add and delete effects respectively, where $Pre(a), Add(a), Del(a)$ are all subsets of $F$. 
+An action $a$ is applicable in a state $s$ if preconditions of $a$ are true in $s$; $pre(a) \in s$. 
+If an action $a$ is executed in state $s$ (noted as $\phi(s,a)$), it results in a new state $s^{\prime} = (s \setminus del(a) \cup add(a))$.  
+A solution for $P$ is a plan $\pi = \{a_1, \dots ,a_k\}$ of length $k$ that modifies $I$ into $G$ by execution of actions $a_1, \dots ,a_k$.
+%The domains are discrete with unit-cost actions.  \frommak{this is standard for STRIPS}
+
+Ramirez and Geffner \shortcite{ramirez2010probabilistic} define an offline goal recognition problem as $T= \langle D, \mathcal{G}, O, Pr \rangle$ where $D=\langle F, A, I \rangle$ is a planning domain, $\mathcal{G} \subseteq F$ is the possible set of goals, the observation sequence $O = o_1, \ldots , o_m$ are actions $o_i \in A, i \in[1,m]$, and $Pr$ is a prior probability distribution over $\mathcal{G}$. A solution for $T$ is a probability distribution over $G \in \mathcal{G}$ indicating their likelihood.
+
+Plan intervention bears some similarity to $T$ except the observer should consider all potential sources of damage regardless of initial likelihood, which leads to two differences.
+First, we partition $\mathcal{G} = \lbrace G_d \cup G_u \rbrace$ into disjoint sets ($G_u \neq G_d$) of desirable and undesirable goals, respectively, where $\pi_d$ is a solution for $G_d$ and $\pi_u$ is a solution for $G_u$.
+The perspective of $G_u$ as a ``goal'' is justified for planning where we want to identify plan suffixes that lead to undesirable outcomes.
+(We may discuss $G_d$ or $G_u$ as single goals for convenience even though they are goal sets.)
+\frommak{correct?}
+Second, $Pr$ is less reasonable because $G_d$ are likely while $G_u$ are not.
+We omit $Pr$ in this initial treatment, though they can be addressed in future work.
+
+\theoremstyle{definition}
+\begin{definition}
+An \textnormal{online plan intervention problem} is a tuple $\mathcal{I} = \langle D, O, G_u, G_d \rangle$ where $D=\langle F, A, I \rangle$ is a planning domain, 
+$O$ is  sequence of observed actions,
+$G_d \subseteq F$ is a set of desirable states,
+$G_u \subseteq F$ is a set of undesirable goals.
+\end{definition}
+
+The presence of an attacker extends the above problem $D_{attack}=\langle F \cup F_{attack}, A \cup A_{attack}, I \rangle$ with attack state $F_{attack}$ and attack actions $A_{attack}$.
+Observations must also include the attack actions, so 
+$O_{attack} = o_1, \ldots , o_m$ are actions $o_i \in A \cup A_{attack}, i \in[1,m]$.
+Undesirable state $G_d = G_{attack}$ is synonymous with the attacker's goal(s) .
+\theoremstyle{definition}
+\begin{definition}
+An \textnormal{online \emph{attack} intervention problem} is a tuple $\mathcal{I}_{attack} = \langle D_{attack}, O, G_u, G_d \rangle$ where $D_{attack}$ is a planning domain, 
+$O_{attack}$ is  sequence of observed actions,
+$G_d \subseteq F$ ($G_u \neq G_d$) is a set of desirable states,
+$G_u \subseteq F$ are the attackers goals.
+\end{definition}
+
+A solution to $\mathcal{I}$ or $\mathcal{I}_{attack}$ is a sequence of binary decisions $d_i = \lbrace Y, N \rbrace$ for $1 \leq i \leq m$, matching each $o_i \in O$ indicating whether the observation requires intervention. 
+Intervention decisions are made in an online setting when observations appear incrementally and include actions executed by the attacker or the user.
+Regardless of the problem, we are interested in intervening when a \emph{critical action} occurs.
+Recall that $\pi_u$ is a plan leading to $G_u$.
+\begin{definition}
+A \textnormal{critical action} $a_{crit} \in O$ is an action that also occurs in $\pi_u$.
+\end{definition}
+\noindent There may be more than one $a_{crit}$ in $O$, so the key decision for the observer is whether to intervene when $a_{crit}$ is observed.
+
+In this study, we make several assumptions.
+\textbf{(Observability)} 
+The observer has full observability, while the user can observe everything except $G_u$ and the actions (or resulting state) of the attacker, when present.
+The observer knows about both $G_d$ and $G_u$ and helps avoid $G_u$.
+\textbf{(Plans)} 
+The user follows a satisficing plan to reach $G_d$, but may reach the hidden $G_u$ unwittingly. 
+The attacker follows a satisficing plan to reach $G_u$ and we we assume the plan to reach $G_u$ has a common prefix with a plan to reach $G_d$. 
+Throughout execution, the user and the attacker stick to their original plans; they do not replan.
+%Also, they prefer the shortest plan to achieving their objective, though they may not always take the optimal path.
+%\debug{sach}{isn't this saying the agents are optimal? They are not}  \frommak{removed as redundant, we already say they follow satisficing plans. better?}
+\textbf{(Attacker)}
+When present, the attacker cannot undo a user's actions; this restriction follows from many security domains where an attacker is a remote entity that plants traps.
+
+

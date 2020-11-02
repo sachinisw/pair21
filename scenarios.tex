@@ -1,0 +1,28 @@
+\section{Intervention Scenarios}
+\textbf{Scenario 1: Intervention to support plan-failure detection in mixed-initiative settings}
+
+In mixed-initiative planning systems, humans and machines collaborate in the development and management of plans. In these systems the responsibility of plan generation, execution monitoring, and repair is shared between both humans and machines. Humans and machines evaluate the criticality of this responsibility differently. Human users are more adept in communicating qualitative requirements the system must adhere to compared to machines. Furthermore, human users' interactions with a system may often happen without being asked explicitly. In traditional classical planning systems, the human user often provide a goal and the initial state and the planning system (a machine) comes up with plan(s) to achieve the goal. In mixed-initiative planning systems, the goal is to develop interactions where both humans and machines can further the state of an online planning activity by playing to each others strengths and making effective contributions.
+
+Let us consider a search and rescue scenario where several automated agents (e.g., drones, robots) navigate through some terrain to complete a rescue activity. A human operator is located in the same environment as the automated agents and from time to time will intervene (based on his own judgement) the plans the agents are executing (in a supervisory role). These interventions could include: withdraw units from some area in the terrain, marking certain areas as safe and search strategies and paths to follow.  The combined effort of the human operator and the automated agents must ultimately lead to a successful search and rescue operation. In a real-world scenario, it is hard for the human operator to monitor activities of the entire fleet of automated agents, and will only interfere with regular plan execution activities of the agents in situations where he sees fit. When introduced with sufficient complecations such as partial obeservability for both automated agents and human opeators, their planned actions could lead to undesirable situations. In these circumstances, it is useful to rely on an intervening agent to monitor executions of the automated agents and evaluate effects of the supervisors intervention steps so that failures can be prevented.
+
+In mixed-initiative situations, explainable interventions are very useful particularly when overriding a change the human operator has made, which resulted in a plan failure for the agents in the fleet (e.g., the human operator moving too few agents to one area in the terrain for a search task). When a human user interacts with a planning system he should be able to impose qualitative constraints; for example, intensifying search in certain parts of the terrain at certain times, enforcing time limits for certain activities. On the outset, the human operator may not be able to evaluate the outcomes of enforcing these contastraints. An intervention agent could also be useful in evaluating user-specified constraints against global planning system operation requirements and enforce the requested constraints as necessary.
+
+
+
+%We model a multi-agent environment consisting of two main agents
+
+%given the actors are humans and the 3rd agent is a machine, we can make the machine learn how to calibrate intervention based on some criteria (risk > threshold)
+
+
+
+
+
+
+
+%write up about a design format/scenarios for the agents in which they will be useful
+
+%simplest case is attacker and user (adversarial). now we have 3rd agent to do the interferring. we assume differences in knowlege the two main actors have and rely on a 3rd agent to resolve these differences.
+%The two agents could also have
+%- representation differences? (whats this)
+%- computation differences (utility, goal persuit strategies)
+%- time/info flows (time restrictions, unavailability of info)

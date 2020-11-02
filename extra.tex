@@ -1,0 +1,28 @@
+
+
+%\frommak{ The introduction length feels about right, but the previous two paragraphs veer a bit too far to the techincal description and the overview is lost.  Keep this material, since some could be used as segue material at the start of later sections.  For example, instead of detailing the graph structure, you can simply say ``we construct a graph structure, similar to a planning graph, to extract heuristics'' or something similar.  Assumer your audience is an expert in classical planning, and shoot to have 1-2 sentences about each point.   Most importantly, you will want to end with a paragraph saying explicitly ``The controbutions of this paper are [begin enumeration] *formalizing the intervention problem to model the decision space of an intervening agent *introducing domain-indepenedent features that ... *extending existing plan recogntion benchmarks to support our study *presenting an learning mechanism that determines ... *discussing features that seem to be the most releveant for more effective intervention *... [end enumeration, no indent] We find that our approach ...  Our work lays a foundation for applying classical planning techniques for decision support and assistive agents.''  This is important because you want you reviewers to argue that your contrubtions are sufficient for an ICAPS paper.    Also, you might want to mention online.}
+%
+%(3)extending existing plan recogntion benchmarks to support our study \fromsach{I dont understand what is meant by this one. I do not do any modification to the domain definition of a planning problem}
+
+This is a formalization of explainable online intervention. 
+Explainable intervention is a helpful featuer when agents are used as assistants to human users.
+We used a decision tree, trained offline, to predict whether or not observations made available online warrant intervention. This is an extension of current work in plan/goal recognition. Most current work is offline, and aims to recognize an agent's plan/goal. Intervention is different from the typical plan recognition problem because we assume the observee pursues own goals but at the same time wants to avoid an undesirable state. Therefore, the intervening agent will be required to (1) monitor actions/state unobtrusively to predict trajectories of the observee (keyhole recognition) and (2) assist the observee to safely complete the intended task by suggesting actions or blocking the current step based on its potential to cause an undesirable state.
+The learned model predicts interruptions with a precision of $>80\%$. The features can be used to explain why the intervention occurred to a human user.
+
+\frommak{add limitations to the discussion section so the reviewer isn't surprised by these right at the end of the paper.  Also be sure you carefully state your assumptions in the problem setup so the reviewer sees where you are headed.  Here you just back refer to them with ``Future work should  extend this work to address a number of limitations mentioned during the discussion...''  Try to provide a path forward for each of these or at least the first few steps of that path.}
+Limitations: for large domains with a lot of predicates, this approach is intractable because, graph generation takes a long time. Use a planner instead of the graph.
+Doesn't model uncertainty at the moment. Approach depends on the intervening ability to define the root of the state graph. We can introduce uncertainty by limiting the intervening agent's ability to correctly perceive the current state.
+We also assume probabilities are uniformly distributed across branching factor of a node. This can be replaced by other probability models.
+
+
+%We recognize that the active attacker's case can be expanded to different threat models( e.g., in blocks-words attacker and user compete to spell BAD and DAB respectively. With the hidden block R). These extensions will be studied in future work.
+
+%attacker and user competes to win.so from the graph pick leaves that has both Gu and Gd. now i only pick gd stuff and look where attacker has won. but the attacker can also act on its own and buiild the word he wants.my goal is to help the user reach gd and avoid gu. observation traces used for trainng the modl should have action sequences that both the attacker and user will do to achieve own goals
+
+%Think of what paths to pick to train the model in DAB/BAD. 
+
+
+% we can calibrate across type of protection we want. for example BTAD, TBAD, TABD, TADB state 3 is considered as ok for now because BAD is not there. but the user has not correctly spelled TAD, because user is vision impaired. For now we think this is OK. in future we can calibrate the type of sensitivity we want to label a goal as "pass" or "fail"
+
+
+%In future work, we will study the effects of relaxing this constraint and allowing the attacker to behave as truly adversarial and negate states the user has already achieved. Also expand to classify instances where neither the attacker nor the user wins. In the example of DAB/BAD the hidden block R is treated as the nuisance block. From the user's perspective RDAB DRAB DARB DABR is all the same because user doesn't recognize R. In these cases the user has reached the desirable goal. Also RBAD BRAD BARD BADR is all instances of undesirable goal being reached. The attacker is using R to expand the attack vector.
