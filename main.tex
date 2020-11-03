@@ -97,7 +97,7 @@
 %broad statement of how this work is applicable
 Intervening is common in online assistive agents (e.g., route planning, tutoring) and safety-critical decision making (e.g., cybersecurity, medical diagnosis), where an observer determines how to guide a user toward a desirable outcome while avoiding undesirable outcomes.
 %what's the gap this work addresses
-In the planning domain, intervention requires a slightly different perspective from the standard formulation of plan recognition because the observer needs to account for the goals of the user as well as undesirable outcomes (sometimes inserted by an attacking agent) about which the user may be unaware.
+In the planning domain, intervention requires a slightly different perspective from the standard formulation of plan recognition because the observer needs to account for the goals of the user as well as undesirable outcomes (sometimes inserted by an competing agent) about which the user may be unaware.
 %how does this work address this gap? what is the technical contribution?
 We formalize the plan intervention problem and introduce the Intervention Graph, which characterizes the observer's decision space.
 We propose domain-independent features extracted or sampled from the Intervention Graph to measure the criticality of an action leading to undesirable outcomes.
@@ -132,7 +132,7 @@ State-of-the-art goal recognition techniques only provide a part of the solution
 
 In this work, we create a domain-independent formulation of learning \emph{whether} to intervene.
 At a minimum, intervention problems require a user and some intervening observer.
-In adversarial settings, intervention also requires an attacker.
+In adversarial settings, intervention also requires an competing agent.
 %In either case, the ideal observer would intervene early.  
 
 Since plans to desirable and undesirable outcomes could overlap, there is a tradeoff between mitigating the undesirable outcome while allowing the user some freedom.  
@@ -162,7 +162,8 @@ Our results suggest a tradeoff between the features and algorithms used for inte
 \section{Examples}
 \label{sec:example}
 
-We present two examples that illustrate the kinds of intervention we examine in this work. In the first example, we have the user and the intervening agents as the actors. In the second example we introduce an additional actor, the \textit{attacker}. The intervening agent passively observes the user's and the attacker's actions. Let us assume we have two states that are of interest to the intervening agent: $\mathrm{d}$ is the desirable state and $\mathrm{u}$ is the undesirable state. If $\mathrm{d}$ is reached first, the user wins. If $\mathrm{u}$ is reached first, the user loses. The intervening agent's objective is to help the user win by flagging actions that make $\mathrm{u}$ most likely. We formalize these in the Sections~\ref{sec:prp}, \ref{sec:ip}. Throughout, $\mathrm{u}$ is not known to the user.
+We present two examples that illustrate the kinds of intervention we examine in this work. In the first example, we have the user and the intervening agents as the actors. In the second example we introduce an additional actor, the \textit{competitor}. The competitor is not a standard adversary. Section~\ref{sec:ip} discusses the competitor's role in detail.
+The intervening agent passively observes the user's and the competitor's actions. Let us assume we have two states that are of interest to the intervening agent: $\mathrm{d}$ is the desirable state and $\mathrm{u}$ is the undesirable state. If $\mathrm{d}$ is reached first, the user wins. If $\mathrm{u}$ is reached first, the user loses. The intervening agent's objective is to help the user win by flagging actions that make $\mathrm{u}$ most likely. We formalize these in the Sections~\ref{sec:prp}, \ref{sec:ip}. Throughout, $\mathrm{u}$ is not known to the user.
 
 Figure~\ref{fig:single} shows a grid navigation task where the user navigates from \texttt{w1} by moving vertically and horizontally. \texttt{Y3} contains a pit the user can not see. $\mathrm{d}=$ \textsc{(at z3)} and $\mathrm{u}=$ \textsc{(at y3})
 Assuming optimal behavior, plans A, B and C are all feasible. 
@@ -175,22 +176,22 @@ However, the intervening agent deems B and C as unsafe as the actions \texttt{MO
         \label{fig:single}
 \end{figure}
 
-Figure \ref{fig:multi} shows examples with an attacker in a modified version of the block-words domain used in \cite{ramirez2009plan}.
+Figure \ref{fig:multi} shows examples with the competitor in a modified version of the block-words domain used in \cite{ramirez2009plan}.
 Figure \ref{fig:multi} (top) shows a problem with 4 blocks (T, B, A, D) initially on the table and time flows from left to right. 
 $\mathrm{d}=$ (TAD) and $\mathrm{u}=$ (BAD).
-The user does not know about the attacker modifying the state of block B (dotted line block) nor about $\mathrm{u}$.
-Thus the user may enable $\mathrm{d}$ with the action STACK A D and creating an opportunity for the attacker to to reach $\mathrm{u}$ first. 
-Therefore, assuming both the user and the attacker are optimal, intervention must happen when the critical action \texttt{PICKUP(attacker,B)} is observed. 
+The user does not know about the competitor's modifying the state of block B (dotted line block) nor about $\mathrm{u}$.
+Thus the user may enable $\mathrm{d}$ with the action STACK A D and creating an opportunity for the competitor to reach $\mathrm{u}$ first. 
+Therefore, assuming both the user and the competitor are optimal, intervention must happen when the critical action \texttt{PICKUP(competitor,B)} is observed. 
 Any subsequent action must also be flagged if it leads further toward $\mathrm{u}$  (e.g., \texttt{STACK(user, B, A}). 
 
 Figure \ref{fig:multi}~(bottom) shows a similar problem where the critical action is observed earlier.
 Here, $\mathrm{d}= $ (CUP) and $\mathrm{u}= $ (CUT), the user does not observe block T, 
-and intervention must happen when \texttt{STACK(attacker, T, P)} is observed. If not, the user could unwittingly reach $\mathrm{u}$ by placing U on T (thinking P is free) and stacking C on U. 
+and intervention must happen when \texttt{STACK(competitor, T, P)} is observed. If not, the user could unwittingly reach $\mathrm{u}$ by placing U on T (thinking P is free) and stacking C on U. 
 Thus, any subsequent action leading  to $\mathrm{u}$ must also be flagged to prevent the error.
 
 \begin{figure}[t]
           \centering{\includegraphics[width=0.7\columnwidth]{bw.pdf}}
-        \caption{Reaching $\mathrm{u}= $ (BAD) (top) and $\mathrm{u}= $ (CUT) (bottom) with an attacker and a user.  The table initially contains all four blocks in each example. A block in the user or attacker row indicates a pickup action that is removed using a stack action.}
+        \caption{Reaching $\mathrm{u}= $ (BAD) (top) and $\mathrm{u}= $ (CUT) (bottom) with an competitor and a user.  The table initially contains all four blocks in each example. A block in the user or competitor row indicates a pickup action that is removed using a stack action.}
         \label{fig:multi}
 \end{figure}
 
@@ -215,7 +216,7 @@ A solution for $P$ is a plan $\pi = \{a_1, \dots ,a_k\}$ of length $k$ that modi
 Ramirez and Geffner \shortcite{ramirez2010probabilistic} define an offline plan recognition problem as $T= \langle D, \mathcal{G}, O, Pr \rangle$ where $D=\langle F, A, I \rangle$ is a planning domain, $\mathcal{G} \subseteq F$ is the possible set of goals, the observation sequence $O = o_1, \ldots , o_m$ are actions $o_i \in A, i \in[1,m]$, and $Pr$ is a prior probability distribution over $\mathcal{G}$. A solution for $T$ is a probability distribution over $G \in \mathcal{G}$ indicating their likelihood. 
 Following the examples in Section~\ref{sec:example}, $\mathcal{G}=\lbrace\mathrm{u}, \mathrm{d}\rbrace$ and we assume a uniform prior probability distribution over $\mathcal{G}$. 
 The intervening agent's recognition problem is: in domain $D$, given $O = \lbrace o_1, \ldots o_i\rbrace$, what is the most likely state in $\mathcal{G}$ if $o_i$ is observed $(1\leq i)$? 
-Note that the intervening agent asks this question online, when it makes a new observation.
+Note that the intervening agent asks this question online, when it makes a new observation (not the full set of observations).
 
 As the simplest solution, the intervening agent can flag any observation that make $\mathrm{u}$ most likely. 
 But, in the intervention problem we are interested flagging only a special subset of observations called the \textit{critical actions}. If $\mathrm{u}$ and $\mathrm{d}$ are too close in the state space, the intervening agent may find it difficult to recognize one state as most likely. Also we want to be able to tune the intervention sensitivity; early vs. late critical actions.
@@ -226,40 +227,38 @@ But, in the intervention problem we are interested flagging only a special subse
 Identifying critical actions require that the intervening agent consider all potential sources of damage to the user's planning problem, regardless the initial likelihood. 
 So, the intervening agent needs to first partition the plan space into two disjoint sets: undesirable plans $\Pi_{\mathrm{u}}$ are plans that achieve $\mathrm{u}$ first, and desirable plans $\Pi_{\mathrm{d}}$ that achieve $\mathrm{d}$ first. The perspective of $\mathrm{u}$ as a ``goal'' is justified for planning where we want to identify plan suffixes that lead to undesirable outcomes. 
 We may discuss $\mathrm{d}$ or $\mathrm{u}$ as single goals for convenience even though they are goal sets.
-Second, uniform $Pr$ is less reasonable because from the user's perspective, $\mathrm{d}$ is more likely while $\mathrm{u}$ is not. 
-In this initial treatment, we assume a uniform $Pr$ and discuss it's variations in future work.
+Second, uniform $Pr$ is less reasonable because from the user's perspective, $\mathrm{d}$ is more likely while $\mathrm{u}$ is not. In intervention, the agent asks the question: in domain $D$, must $o_i \in O$ be flagged to prevent reaching $\mathrm{u}$ first?
 
+\theoremstyle{definition}
+\begin{definition}
+The \textnormal{online plan intervention problem} is a tuple $\mathcal{I} = \langle D, O, \mathcal{G} \rangle$ where $D=\langle F, A, I \rangle$ is a planning domain, 
+$O$ is  sequence of observed actions, $\mathrm{d},\mathrm{u} \in \mathcal{G}$ and 
+$\mathrm{d}, \mathrm{u} \subseteq F$
+\end{definition}
+If only the user and the intervening agent are present in the intervention scenario (see Figure~\ref{fig:single}), the user solves the planning problem $P_0=\langle F_0, A_0, I_0,\mathrm{d}\rangle$, where $F_0 \subset F$, $A_0\subseteq A$, $I_0 \subseteq I$ and $\mathrm{d}\subset F$. 
+Because $\mathrm{u}\subset F$, $\mathrm{u}\neq \mathrm{d}$ and $\mathrm{u}$ is hidden to the user, some solutions to $P_0$ become undesirable.
+Observations for $\mathcal{I}$, contain actions from $\Pi_{\mathrm{u}}$ and $\Pi_{\mathrm{d}}$. 
+When a competitor is present (see Figure~\ref{fig:multi}), the user's planning problem is the same $P_0$.
+The competitor wants to solve the planning problem $P_1=\langle F_1, A_1, I_1,\mathrm{u}\rangle$ and $F_1=F_0$, $I_1=I_0$. However, the competitor only has access to some actions in $A$, and $A_1 \cap A_0=\emptyset$. 
+Specifically, the competitor can only perform actions with the hidden block (stack B, pickup B etc.), and the user can not recognize effects of these \textit{hidden} actions. $\mathcal{I}=\langle \langle F_0\cup F_1, A_0\cup
+ A_1, I_0\rangle , O,\mathcal{G}\rangle$.
+Observations for $\mathcal{I}$, contain actions from $A_0$ and $A_1$. 
 
-%$\mathcal{G}=\lbrace\mathrm{u}, \mathrm{d}\rbrace$
+%\theoremstyle{definition}
+%\begin{definition}
+%An \textnormal{online \emph{attack} intervention problem} is a tuple $\mathcal{I}_{attack} = \langle D_{attack}, O, G_u, G_d \rangle$ where $D_{attack}$ is a planning domain, 
+%$O_{attack}$ is  sequence of observed actions,
+%$G_d \subseteq F$ ($G_u \neq G_d$) is a set of desirable states, and
+%$G_u \subseteq F$ are the attacker's goals.
+%\end{definition}
+
+A solution to $\mathcal{I}$ is a sequence of binary decisions that maps the observations $o_i\in O$ to $\lbrace Yes,No\rbrace$ indicating whether the observation requires intervention. We discuss two methods to derive functions that perform the mapping. The first method uses a data structure called an \textit{Intervention Graph}. The second method apply machine learning algorithms using features sampled from the intervening agent's decision space.
+
 %we can tune how critical we want the critical actions to be (from the earliest, to the latest. we only tune to latest in the experiments.
+%solution to the intervention problem is a function that maps o \in O to {Y,N}. In this work we discuss how we can derive this function using the intervention graph features and plan distance features. and in this work we have tuned this function to the latest possible setting.
 
 
-
-
-
-
-\theoremstyle{definition}
-\begin{definition}
-An \textnormal{online plan intervention problem} is a tuple $\mathcal{I} = \langle D, O, G_u, G_d \rangle$ where $D=\langle F, A, I \rangle$ is a planning domain, 
-$O$ is  sequence of observed actions,
-$G_d \subseteq F$ is a set of desirable states, and
-$G_u \subseteq F$ is a set of undesirable states.
-\end{definition}
-
-The presence of an attacker extends the above problem $D_{attack}=\langle F \cup F_{attack}, A \cup A_{attack}, I \rangle$ with attack state $F_{attack}$ and attack actions $A_{attack}$.
-Observations must also include the attack actions, so 
-$O_{attack} = o_1, \ldots , o_m$ are actions $o_i \in A \cup A_{attack}, i \in[1,m]$.
-Undesirable state $G_u = G_{attack}$ is synonymous with the attacker's goal(s).
-\theoremstyle{definition}
-\begin{definition}
-An \textnormal{online \emph{attack} intervention problem} is a tuple $\mathcal{I}_{attack} = \langle D_{attack}, O, G_u, G_d \rangle$ where $D_{attack}$ is a planning domain, 
-$O_{attack}$ is  sequence of observed actions,
-$G_d \subseteq F$ ($G_u \neq G_d$) is a set of desirable states, and
-$G_u \subseteq F$ are the attacker's goals.
-\end{definition}
-
-A solution to $\mathcal{I}$ or $\mathcal{I}_{attack}$ is a sequence of binary decisions $d_i = \lbrace Y, N \rbrace$ for $1 \leq i \leq m$, matching each $o_i \in O$ indicating whether the observation requires intervention. 
-Intervention decisions are made in an online setting when observations appear incrementally and include actions executed by the attacker or the user.
+Intervention decisions are made in an online setting when observations appear incrementally.
 Regardless of the problem, we are interested in intervening when a \emph{critical action} occurs.
 Recall that $\pi_u$ is a plan leading to $G_u$.
 \begin{definition}
@@ -269,16 +268,14 @@ A \textnormal{critical action} $a_{crit} \in O$ is an action that also occurs in
 
 In this study, we make several assumptions.
 \textbf{(Observability)} 
-The observer has full observability, while the user can observe everything except $G_u$ and the actions (or resulting state) of the attacker, when present.
+The observer has full observability, while the user can observe everything except $G_u$ and the actions (or resulting state) of the competitor, when present.
 The observer knows about both $G_d$ and $G_u$ and helps avoid $G_u$.
 \textbf{(Plans)} 
 The user follows a satisficing plan to reach $G_d$, but may reach the hidden $G_u$ unwittingly. 
-The attacker follows a satisficing plan to reach $G_u$ and we assume the plan to reach $G_u$ has a common prefix with a plan to reach $G_d$. 
-Throughout execution, the user and the attacker stick to their original plans; they do not replan.
-%Also, they prefer the shortest plan to achieving their objective, though they may not always take the optimal path.
-%\debug{sach}{isn't this saying the agents are optimal? They are not}  \frommak{removed as redundant, we already say they follow satisficing plans. better?}
-\textbf{(Attacker)}
-When present, the attacker cannot undo a user's actions; this restriction follows from many security domains where an attacker is a remote entity that plants traps.
+The competitor follows a satisficing plan to reach $G_u$ and we assume the plan to reach $G_u$ has a common prefix with a plan to reach $G_d$. 
+Throughout execution, the user and the competitor stick to their original plans; they do not replan.
+\textbf{(Competitor)}
+When present, the competitor cannot undo the user's actions; this restriction follows from many security domains where an attacker is a remote entity that plants traps.
 
 
 
@@ -292,7 +289,7 @@ Unfortunately, extracting these features can be intractable when the interventio
 
 
 
-The Intervention Graph allows the observer to evaluate how close in the state space the current projection of the observed partial plan is to $G_u$. The Intervention Graph consists of alternating state and action layers where each state layer consists of predicates that have been made true by the actions in the previous layer. An action layer consists of actions $a\in A$ whose preconditions are satisfied in the state. Algorithm \ref{bsg} describes the process of building the Intervention Graph. The algorithm takes as input a domain theory $D$, state $s$ and $G_u$ and $G_d$ (lines 1-2). Initially, before any observations have been made, the current state (i.e., root of the tree) is set to initial state $I$. Next, using the domain theory $D$, actions  $a\in A$ whose preconditions are satisfied at current state are added to the graph, ignoring delete effects (lines 5-6). Each action in level $i$ spawns possible states for level $i+1$. Line 7 ensures that backtrack actions are not added to the graph. This is because the user and the attacker (if present) in our domain are (bounded) rational agents. For each applicable effect state a search vertex is created, with an edge, representing the action responsible for the state transition connecting the parent and the child (lines 8-10). Calling the method recursively for each state until $G_d$ and $G_u$ are added to some subsequent level in the graph will generate a possible hypotheses space for the observer (line 11). To ensure that only realistic plans are explored, we do not add no-op actions to the action layers in the graph. As a new observation arrives, the root of the graph is changed to reflect the new state after the observation and subsequent layers are also modified to that effect.  
+The Intervention Graph allows the observer to evaluate how close in the state space the current projection of the observed partial plan is to $G_u$. The Intervention Graph consists of alternating state and action layers where each state layer consists of predicates that have been made true by the actions in the previous layer. An action layer consists of actions $a\in A$ whose preconditions are satisfied in the state. Algorithm \ref{bsg} describes the process of building the Intervention Graph. The algorithm takes as input a domain theory $D$, state $s$ and $G_u$ and $G_d$ (lines 1-2). Initially, before any observations have been made, the current state (i.e., root of the tree) is set to initial state $I$. Next, using the domain theory $D$, actions  $a\in A$ whose preconditions are satisfied at current state are added to the graph, ignoring delete effects (lines 5-6). Each action in level $i$ spawns possible states for level $i+1$. Line 7 ensures that backtrack actions are not added to the graph. This is because the user and the competitor (if present) in our domain are (bounded) rational agents. For each applicable effect state a search vertex is created, with an edge, representing the action responsible for the state transition connecting the parent and the child (lines 8-10). Calling the method recursively for each state until $G_d$ and $G_u$ are added to some subsequent level in the graph will generate a possible hypotheses space for the observer (line 11). To ensure that only realistic plans are explored, we do not add no-op actions to the action layers in the graph. As a new observation arrives, the root of the graph is changed to reflect the new state after the observation and subsequent layers are also modified to that effect.  
 %\debug{mak}{clarify how the IG is different from the actual RPG and discuss algorithm in detail. Alternatively, consider forgoing the link to the RPG and just discussing the IG in terms of the search space. }
 %\debug{sachini}{why does the IG need to explore longer plans that those that reach $G_d$.  Mak: Explore around the fringe because we don't know where $G_u$ ``lives.''}
 \begin{algorithm}[tb]
@@ -319,12 +316,12 @@ The Intervention Graph allows the observer to evaluate how close in the state sp
         \end{algorithmic}
 \end{algorithm}
 
-Thus, the Intervention Graph is a weighted, single-root, directed acyclic connected graph $IG= \langle V,E \rangle$, where $V$ is the set of vertices denoting possible states the user could be in until $G_d$ is reached, and $E$ is the set of edges representing actions from $A \cup A_{attack}$. A path from the root of the tree to $G_d$ that goes through $G_u$ represents an unsafe plan, while a path from root to a node containing $G_d$ that bypasses $G_u$ represents a safe plan. The Intervention Graph is also helpful in separating truly unsafe situations from states where the user can tolerate the attacker's actions (e.g., nuisances) and still reach $G_d$ by bypassing $G_u$. 
+Thus, the Intervention Graph is a weighted, single-root, directed acyclic connected graph $IG= \langle V,E \rangle$, where $V$ is the set of vertices denoting possible states the user could be in until $\mathrm{d}$ is reached, and $E$ is the set of edges representing actions from $A_0 \cup A_{1}$. A path from the root of the tree to $\mathrm{d}$ that goes through $\mathrm{u}$ represents an unsafe plan, while a path from root to a node containing $G_d$ that bypasses $G_u$ represents a safe plan. The Intervention Graph is also helpful in separating truly unsafe situations from states where the user can tolerate the competitor's actions (e.g., nuisances) and still reach $G_d$ by bypassing $G_u$. 
 
 \textbf{Example:} Figure \ref{fig:fails} extends the example from Figure \ref{fig:multi} (A). Because block B is invisible, the user accepts all the four formations as sucessfully reaching $G_d$. However, case (2) is a truly unsafe situation because the user has unwittingly reached $G_u$. The observer must be able to flag a correct $a_{crit}$ case (2). In contrast, plans leading to the states shown in cases (1), (3) and (4) should be identified as safe by the observer, because $G_u$ is not achieved. Actions in these plans must not be flagged as critical.
 \begin{figure}[ht]
         \centering{\includegraphics[width=0.6\columnwidth]{activefail.pdf}}
-        \caption{User's attempts to reach $G_d$ in the presence of an attacker}
+        \caption{User's attempts to reach $G_d$ in the presence of competitor}
         \label{fig:fails}
 \end{figure}
 
@@ -483,7 +480,7 @@ A full parameter search revealed the best parameters for the classifiers. The de
 \section{Results and Discussion}
 We focus on two questions: (1) Using domain-independent features indicative of the likelihood to reach $G_u$ from current state, can the intervening agent correctly interrupt to prevent the user from reaching $G_u$? and (2) How does the learning approach perform against state-of the-art goal recognition? To address the first question, we evaluated the performance of the learned model to predict intervention on previously unseen problems.
 
-The benchmark suite consists of Blocks-words, IPC Grid, Navigator and Ferry domains and the Generalized Rush Hour domain. For the \textbf{Blocks-words} domain, we chose word building problems. The words user and the attacker want to build are different but they have some common letters (e.g., TAD/BAD). The attacker is able to exploit the user's progress on stacking blocks to complete word the attacker wants to build and uses a hidden block in the domain to create nuisance scenaios. In the \textbf{IPC grid} domain, the user agent moves through a grid to get from point A to B. Certain locked positions on the grid can be opened by picking up keys. In the \textbf{Navigator} domain, the user agent simply moves from one point in grid to another. In Easy-IPC and Navigator domains, we designated certain locations on the grid as traps. The goal of the user is to navigate to a specific point on the grid safely. In the \textbf{Ferry} domain, a single ferry (akin to a user) moves cars between different locations. In the Ferry domain a port is \emph{compromised}. The ferry's objective is to transport cars to specified locations without passing the compromised port. In the \textbf{Rush Hour} domain, we created puzzles containing vehicles that need not be moved on arbitrary grid sizes and exits. The player (user agent) wins by moving a designated goal car to the exit. We also designated some vehicles on the grid as forbidden. The forbidden vehicles need not be moved to solve the puzzle. Intervention is generated when the user moves any of the forbidden vehicles while solving the puzzle.
+The benchmark suite consists of Blocks-words, IPC Grid, Navigator and Ferry domains and the Generalized Rush Hour domain. For the \textbf{Blocks-words} domain, we chose word building problems. The words user and the competitor want to build are different but they have some common letters (e.g., TAD/BAD). The competitor is able to exploit the user's progress on stacking blocks to complete word the competitor wants to build and uses a hidden block in the domain to create nuisance scenarios. In the \textbf{IPC grid} domain, the user agent moves through a grid to get from point A to B. Certain locked positions on the grid can be opened by picking up keys. In the \textbf{Navigator} domain, the user agent simply moves from one point in grid to another. In Easy-IPC and Navigator domains, we designated certain locations on the grid as traps. The goal of the user is to navigate to a specific point on the grid safely. In the \textbf{Ferry} domain, a single ferry (akin to a user) moves cars between different locations. In the Ferry domain a port is \emph{compromised}. The ferry's objective is to transport cars to specified locations without passing the compromised port. In the \textbf{Rush Hour} domain, we created puzzles containing vehicles that need not be moved on arbitrary grid sizes and exits. The player (user agent) wins by moving a designated goal car to the exit. We also designated some vehicles on the grid as forbidden. The forbidden vehicles need not be moved to solve the puzzle. Intervention is generated when the user moves any of the forbidden vehicles while solving the puzzle.
 
 We generate 3 separate test instances of 20 problems each (total of 60) for the benchmark domains containing problems different from trained instances. For example, number of blocks in the domain (block-words), size of grid (navigator, easy-ipc), number of cars and exit locations (Rush Hour), accessible and inaccessible paths on the grid (navigator, easy-ipc), properties of artifacts in the grid (easy-ipc). For each problem in an instance we generated 10 observation traces (total of 600 test observation traces). For the Rush Hour domain we created 2200 observation traces and split to training and testing 60/40. We define true-positive as the classifier correctly predicting $a_{crit}$. True-negative is an instance where the classifier  correctly predicts an observation as not critical. False-positives are instances where classifier incorrectly predicts $a_{crit}$. False-negatives are instances where the classifier incorrectly predicts the observation not as critical. Naturally, our test observation traces contain a large number of negatives. To offset the bias introduced to the classifier by the class imbalance, we report Matthews correlation coefficient (MCC) along with the F1 measure. We report the MCC because, it gives an accurate measure the quality of a binary classification while taking into account the different class sizes. In our data set, there are many negative observations.
 
