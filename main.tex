@@ -207,16 +207,16 @@ We develop an approach whereby plans leading to $\mathrm{u}$ or $\mathrm{d}$ are
 The observer should allow the user to pursue plans leading to $\mathrm{d}$ and intervene when the user takes actions from plans that get ``too close'' to $\mathrm{u}$.
 Our key insight is considering $\mathrm{u}$ as a ``goal'', which is justified for planning where we want to identify plan suffixes that lead to undesirable outcomes. 
 Undesirable plans $\Pi_{\mathrm{u}}$ are plans that achieve $\mathrm{u}$ and desirable plans $\Pi_{\mathrm{d}}$ achieve $\mathrm{d}$. 
-Thus, the observer must consider these goals together $\mathcal{G}=\lbrace\mathrm{u} \cup \mathrm{d}\rbrace$
-The observer's recognition problem is: in domain $D$, given $O = \lbrace o_1, \ldots o_i\rbrace$, what is the most likely ``goal'' from $\mathcal{G}$ if $o_i$ will be observed? 
+Thus, the observer must consider the two states together $\mathcal{G}=\lbrace\mathrm{u} \cup \mathrm{d}\rbrace$
+The observer's recognition problem is: in domain $D$, given $O = \lbrace o_1, \ldots o_{i-1}\rbrace$, what is the most likely ``goal'' from $\mathcal{G}$ if $o_i$ will be observed? 
 When $\mathrm{u}$ and $\mathrm{d}$ are far apart, intervention is straightforward; when they are proximate, the observer may find it difficult to recognize $\mathrm{u}$. 
 
 
 Identifying critical actions requires that the observer consider all potential sources of damage to the user's planning problem, regardless the initial likelihood.
-In intervention, the agent asks the question: in domain $D$, must $o_i \in O$ be flagged to prevent reaching $\mathrm{u}$ first?
+In intervention, the observer asks the question: in domain $D$, given $O = \lbrace o_1, \ldots o_{i-1}\rbrace$ must $o_i \in O$ be flagged to prevent reaching $\mathrm{u}$ first?
 %\debug{mak}{perhaps move these assumptions to the list of assumptions below?}
 The observer makes this decision while observations arrive incrementally. 
-If we are to solve intervention as a plan recognition problem, we need to assume a uniform prior probability distribution over $\mathcal{G}$. However, uniform $Pr$ is less reasonable because from the user's perspective, $\mathrm{d}$ is more likely while $\mathrm{u}$ is not. 
+If we are to solve intervention as a plan recognition problem, we need to assume a prior probability distribution (e.g., uniform) over $\mathcal{G}$. However, assuming the distribution of $Pr$ is less reasonable because from the user's perspective, $\mathrm{d}$ is more likely while $\mathrm{u}$ is not. 
 
 
 \theoremstyle{definition}
@@ -233,18 +233,17 @@ A solution to $\mathcal{I}$ is a sequence of binary decisions that maps the obse
 We discuss two methods to derive functions that perform the mapping. 
 The first method uses a data structure called an \textit{Intervention Graph}. 
 The second method apply machine learning algorithms using features sampled from the plan space of the observer's recognition problem.
-At the very latest, the observer must flag actions having post-conditions such that, if added make $\mathrm{u}$ true (e.g.,\textsc{move y2 y3} in Figure~\ref{fig:single}, \textsc{stack B A} in Figure~\ref{fig:multi} (top)). 
-If flagging early, the agent needs to identify all actions leading to $\mathrm{u}$ (e.g., \textsc{stack T P}, \textsc{stack U T}, \textsc{stack C U} etc. in Figure~\ref{fig:multi} (bottom)). 
+At the very latest, the observer must flag actions having post-conditions such that, if added make $\mathrm{u}$ true (e.g., \texttt{move y2 y3} in Figure~\ref{fig:single}). 
 These two conditions (late vs. early) require different decision functions. 
 In this paper, we discuss the design of the decision function $\mathcal{F}$ that flags the latest (i.e., most critical) actions. Therefore, we define the critical action to only reflect what it means to be \textit{late}.
 \begin{definition}
-A \textnormal{late critical action} $a_{crit} \in O$ is an action that occurs in any undesirable plan $\pi_{\mathrm{u}}\in \Pi_{\mathrm{u}}$ and execution of $a_{crit}$ in state $s$ results in a state $s\prime$ such that $s\prime\models \mathrm{u}$.
+A \textnormal{late critical action} $a_{crit} \in O$ is an action that occurs in any undesirable plan $\pi_{\mathrm{u}}\in \Pi_{\mathrm{u}}$ and execution of $a_{crit}$ in state $s$ results in a state $s^\prime$ such that $s^\prime\models \mathrm{u}$.
 \end{definition}
 \noindent There may be more than one $a_{crit}$ in $O$ for the user's planning problem $P_0$. So, the key decision for the observer is whether to intervene when $a_{crit}$ is observed. For this we use the intervention decision function $\mathcal{F}$
 \begin{definition}
-An \textnormal{intervention decision function} $\mathcal{F}$ is a function that takes as input, example actions (of a critical level $\Theta$) in a number of $P_0$ planning problem instances and a set of domain independent features (described next) corresponding to those critical actions and produces a learned model that can recognize actions of the same critical level $\Theta$ occurring in observations of a new planning instance.
+An \textnormal{intervention decision function} $\mathcal{F}$ takes as input, example actions (of a critical level $\Theta$) in a number of $P_0$ planning problem instances and a set of domain independent features (described next) corresponding to those critical actions and produces a learned model that can recognize actions of the same critical level $\Theta$ occurring in observations of a new planning instance.
 \end{definition}
-\noindent$\Theta\mapsto\lbrace `late`,`early`\rbrace$ is an application specific constant.
+\noindent$\Theta\mapsto\lbrace$`late',`early'$\rbrace$ is an application specific constant.
 
 %=========================================================================
 %=========================================================================
@@ -257,20 +256,26 @@ Above, we introduced the simple version of the intervention problem.
 But sometimes there is another agent interacting with the environment at the same time as the user.
 We introduce an additional actor, the \textit{competitor}. 
 The competitor is not a standard adversary like you would find in a two-player game.
-The competitor has a limited set of actions, which he uses to create states that will lead to $\mathrm{u}$ before $\mathrm{d}$ is reached.
+The competitor has a limited set of actions, which he uses to create states that will lead to $\mathrm{u}$ before $\mathrm{d}$ is reached. 
 
 Figure \ref{fig:multi} shows examples with the competitor in a modified version of the block-words domain used in \cite{ramirez2009plan}.
 Figure \ref{fig:multi} (top) shows a problem with 4 blocks (T, B, A, D) initially on the table and time flows from left to right. 
 $\mathrm{d}=$ (TAD) and $\mathrm{u}=$ (BAD).
 The user does not know about the competitor's modifying the state of block B (dotted line block) nor about $\mathrm{u}$.
-Thus the user may enable $\mathrm{d}$ with the action STACK A D and creating an opportunity for the competitor to reach $\mathrm{u}$ first. 
-Assuming both the user and the competitor are optimal in this example, intervention must happen when the critical action \texttt{PICKUP(competitor,B)} is observed. 
-Any subsequent action must also be flagged if it leads further toward $\mathrm{u}$  (e.g., \texttt{STACK(user, B, A}). 
+Thus the user may enable $\mathrm{d}$ with the action \texttt{stack (user,A,D)} and at the same time creating an opportunity for the competitor to reach $\mathrm{u}$ first. 
+Assuming the user and the competitor are optimal in this example, if the observer is intervening late ($\Theta=late$), $a_{crit}=\lbrace$\texttt{stack(competitor,B,A)}$\rbrace$. 
 
-Figure \ref{fig:multi}~(bottom) shows a similar problem where the critical action is observed earlier.
+
+When intervening early ($\Theta=early$), we define a critical sequence $s_{crit}$ that the observer must flag.
+\begin{definition}
+A \textnormal{critical sequence} $s_{crit} \subseteq O$ is a totally ordered set of actions in any undesirable plan $\pi_{\mathrm{u}}\in \Pi_{\mathrm{u}}$ and ordered execution of actions in $s_{crit}$ from state $s$ results in a state $s^\prime$ such that $s^\prime\models \mathrm{u}$.
+\end{definition}
+\noindent In Figure \ref{fig:multi} (top), $s_{crit}=\lbrace$\texttt{pickup(competitor,B)}, \texttt{stack(competitor,B,A)}$\rbrace$.
+Figure \ref{fig:multi}~(bottom) shows a problem with a longer $s_{crit}$.
 Here, $\mathrm{d}= $ (CUP) and $\mathrm{u}= $ (CUT), the user does not observe block T, 
 and intervention must happen when \texttt{STACK(competitor, T, P)} is observed. If not, the user could unwittingly reach $\mathrm{u}$ by placing U on T (thinking P is free) and stacking C on U. 
-Thus, any subsequent action leading  to $\mathrm{u}$ must also be flagged to prevent the error.
+Thus, any subsequent action leading  to $\mathrm{u}$ must also be flagged to prevent the error. 
+Therefore, $s_{crit}=\lbrace$\texttt{stack(competitor,T,P)}, \texttt{pickup(user,U)},\texttt{stack(user,U,T)}, \texttt{pickup(user,C)},\texttt{stack(user,C,U)}$\rbrace$.
 
 \begin{figure}[t]
           \centering{\includegraphics[width=0.7\columnwidth]{bw.pdf}}
@@ -288,16 +293,9 @@ The user solves the planning problem $P_0=\langle F_0, A_0, I,\mathrm{d}\rangle$
 The competitor wants to solve the planning problem $P_1=\langle F_1, A_1, I,\mathrm{u}\rangle$.
 However, the competitor does not have access to all the actions needed to achieve $\mathrm{u}$ and requires the user to enable preconditions for the actions in $A_1$ and $A_1 \cap A_0=\emptyset$ and $F_1 \neq F_0$. This and because $\mathrm{u}$ is hidden to the user, some solutions to $P_0$ become undesirable.
 Observations for $\mathcal{I}$, contain actions from $A_0$ and $A_1$.
-For example, in \ref{fig:multi}(top), the competitor can only perform actions with the hidden block (stack B, pickup B etc.), and the user can not recognize effects of these \textit{hidden} actions. 
+For example, in Figure \ref{fig:multi}(top), the competitor can only perform actions with the hidden block (stack B, pickup B etc.), and the user can not recognize effects of these \textit{hidden} actions. 
 
-%\theoremstyle{definition}
-%\begin{definition}
-%An \textnormal{online \emph{attack} intervention problem} is a tuple $\mathcal{I}_{attack} = \langle D_{attack}, O, \mathrm{u}, G_d \rangle$ where $D_{attack}$ is a planning domain, 
-%$O_{attack}$ is  sequence of observed actions,
-%$G_d \subseteq F$ ($\mathrm{u} \neq G_d$) is a set of desirable states, and
-%$\mathrm{u} \subseteq F$ are the attacker's goals.
-%\end{definition}
-
+The execution model of the agents is such that the user and the competitor (if present) take turns in proposing actions to the observer. Which agent proposes first is decided randomly. Given an observation trace $O = \lbrace o_1, o_2,\ldots o_{i-1}\rbrace$, the observer sees the effects of the actions upto $o_{i-1}$. The user or the competitor (if present) proposes the next action $a_i$ to execute from their respective action sets $A_0$ and $A_1$. The proposed action becomes the observation $o_i$ only if it's approved (i.e., action does not need intervention).
 
 In this study, we make several assumptions about the observer.
 \textbf{(Observability)} 
