@@ -95,20 +95,19 @@
 \maketitle
 \begin{abstract}
 %broad statement of how this work is applicable
-Intervening is common in online assistive agents (e.g., route planning, tutoring) and safety-critical decision making (e.g., cybersecurity, medical diagnosis), where an observer determines how to guide a user toward a desirable outcome while avoiding undesirable outcomes.
+Intervening is common in online assistive agents and safety-critical decision making, where an observer determines how to guide a user toward a desirable outcome.
 %what's the gap this work addresses
-In the planning domain, intervention requires a slightly different perspective from the standard formulation of plan recognition because the observer needs to account for the goals of the user as well as undesirable outcomes (sometimes enabled by a competing agent) about which the user may be unaware.
+%In the planning domain, intervention requires a slightly different perspective from the standard formulation of plan recognition because the observer needs to account for the goals of the user as well as undesirable outcomes (sometimes enabled by a competing agent) about which the user may be unaware.
+Intervention extends plan recognition to account for the goals of the user as well as undesirable outcomes.
 %how does this work address this gap? what is the technical contribution?
-We formalize the plan intervention problem and introduce the Intervention Graph, which characterizes the observer's decision space.
-We propose domain-independent features extracted or sampled from the Intervention Graph to measure the criticality of an action leading to undesirable outcomes.
-We apply these features to four learning algorithms that learn whether to intervene in online scenarios with varying undesirable outcomes.
+We formalize the plan intervention problem and characterize the observer's decision space as an Intervention Graph, from which 
+We extract domain-independent features to assess critical actions leading to undesirable outcomes.
+We apply these features to learn whether to intervene in online scenarios while varying undesirable outcomes.
 %how do you evaluate the approach?
-In an evaluation of several benchmark problems, including one we introduce called Rush Hour,
 %what are the findings?
-the learned models outperform, sometimes substantially, three recent plan recognition approaches in most problems, although the performance varies by the application.
+In several benchmark problems, the learned models dominate three recent plan recognition approaches, although the performance varies by the application.
 %summing up: what are the implications? who cares?
-To our knowledge, this is the first work to incorporate recent plan recognition techniques into plan intervention.
-Our work lays a foundation for further applications of assistive and decision support agents.
+To our knowledge, this is the first work to incorporate plan recognition for intervention, which lays a foundation for further applications of plan recognition for assistive and decision support agents.
 \end{abstract}
 
 %=========================================================================
@@ -121,32 +120,31 @@ Even the best plan can go wrong.
 Dangers might arise from a user failing to follow the plan correctly or as a result of a nefarious agent.
 Consider route planning where a driver was unaware of upcoming road damage or a traffic jam.  
 Or consider cybersecurity where a user was unaware of an unsafe hyperlink.
-In both, plans achieving the desirable goal (e.g., arriving at the destination, checking email) might have similar prefixes to those that result in undesirable outcomes (e.g., hitting a pothole, clicking on a phishing link); only the plan suffix differs.
-State-of-the-art goal recognition techniques only provide a part of the solution for selecting interventions.
+In both, plans achieving the desirable goal might have similar prefixes to those that result in undesirable outcomes; only the plan suffix differs.
+State-of-the-art plan recognition techniques only provide a part of the solution for selecting interventions.
 
 In this work, we create a domain-independent formulation of learning \emph{whether} to intervene.
 At a minimum, intervention problems require a user and some intervening observer.
 In other settings, the observer also considers actions of a competing agent.
-The user and the competing agent have partial visibility and can not recognize effects of certain actions that take place in the environment.
-The user and the competitor (if present) take turns in proposing actions to the observer. The observer evaluates how critical the presented action is for the user to reach his goal while avoiding the undesirable state using  domain-independent features. If the observer finds that the presented action is critical, then it is flagged to warn the user. 
+The user and the competing agent have partial visibility and can not recognize the effects of certain actions that take place in the environment.
+The user and the competitor (if present) take turns in proposing actions to the observer. The observer evaluates how critical the presented action is for the user to reach his goal while avoiding the undesirable state using  domain-independent features. If the observer finds that the presented action is critical, then it is flagged to warn the user. We discuss two types of actions that must be flagged: direct and indirect. Direct contributing actions have the undesirable state as their post-condition. Indirect contributing actions are sequences that add the necessary conditions leading to the undesirable state.
 
-We discuss two levels of criticality for flagging actions: early and late. Since plans to desirable and undesirable outcomes could overlap, the observer needs to mitigate the undesirable outcome while allowing the user some freedom.  
-Reducing intrusion and allowing more freedom are reasonable for assistive agents where a misstep is correctable and its cost is comparatively low (e.g., a GPS route planner, an online tutor) but could be disastrous when an undesirable outcome cannot be undone and its cost is high (e.g., medical diagnosis, cybersecurity). Late intervention flags actions that directly cause the undesirable state. Early intervention flags action sequences that add the necessary conditions to the undesirable state.
+%Since plans to desirable and undesirable outcomes could overlap, the observer needs to mitigate the undesirable outcome while allowing the user some freedom.  
+%Reducing intrusion and allowing more freedom are reasonable for assistive agents where a misstep is correctable and its cost is comparatively low (e.g., a GPS route planner, an online tutor) but could be disastrous when an undesirable outcome cannot be undone and its cost is high (e.g., medical diagnosis, cybersecurity). 
+%Late intervention flags actions that directly cause the undesirable state. Early intervention flags action sequences that add the necessary conditions to the undesirable state.
 
 The contributions of this paper include:
 \begin{itemize}
-\item extending an existing plan recognition model to support the intervention problem;
+\item extending an existing plan recognition model to the intervention problem and demonstrating that three state-of-the-art approaches do not perform well for this problem
 \item formalizing the online intervention problem as determining when the criticality--i.e., the opportunity or urgency of possible damage--of a state warrants interruption; 
 \item modeling the observer's decision space as an \emph{Intervention Graph}, which can be constructed explicitly or sampled with the TopK planner (Riabov et al., \citeyear{riabov2014});
 \item defining domain-\emph{independent} features to assess the criticality of a state using the Intervention Graph;
 \item extending existing goal/plan recognition benchmarks \cite{ramirez2009plan,ramirez2010probabilistic} to incorporate intervention and introducing a new plan intervention benchmark domain called Rush Hour\footnote{We will release these benchmarks and code upon publication}, 
 \item adapting four algorithms that learn whether to intervene, 
-\item comparing these learning algorithms against three state-of-the-art plan recognition techniques, and
-\item demonstrating that all learning methods dominate when using the intervention graph features and perform better or comparably using sampled features.
 \end{itemize}
 Our results show that the proposed intervention solution  outperforms existing plan recognition algorithms with fewer false positives and false negatives.
 
-\section{Background: The Plan Recognition Problem}
+\section{Background: Plan Recognition}
 \label{sec:prp}
 We adapt the \emph{offline} plan recognition formulation by Ramirez and Geffner \shortcite{ramirez2010probabilistic} to the problem of \emph{online} plan intervention.
 In that work, a STRIPS \cite{fikes1971strips} planning problem is a tuple $ P = \langle F, A, I, G \rangle$ where $F$ is the set of fluents, $I\subseteq F$ is the initial state, $G  \subseteq F$ represents the set of goal states and $A$ is the set of actions. 
@@ -160,21 +158,20 @@ Ramirez and Geffner \shortcite{ramirez2010probabilistic} define the plan recogni
 
 
 \section{Intervention Example}
-
-Before we extend this plan recognition model to intervention, let us consider an example where a user interacts with an environment while an observer decides whether to intervene.
-We identify two kinds of states:  a desirable state $\mathrm{d} \subseteq F$ is the user's goal and the undesirable state $\mathrm{u} \subseteq F$ represents an outcome the user wants to avoid, but may not be able to detect.
+Consider an example where a user interacts with an environment while an observer decides whether to intervene.
+The observer is interested in two kinds of states:  a desirable state $\mathrm{d} \subseteq F$ is the user's goal and the undesirable state $\mathrm{u} \subseteq F$  is an outcome the user wants to avoid, but may not be able to detect.
 (For convenience, we may discuss $\mathrm{d}$ or $\mathrm{u}$ as single states even though they are sets.)
 The observer's objective is to help the user achieve $\mathrm{d}$ while avoiding $\mathrm{u}$.
-Thus the observer must identify actions for plans that lead to $\mathrm{u}$ and intervene when appropriate.
+Thus the observer must identify actions that lead to $\mathrm{u}$ and intervene when appropriate.
 
 Figure~\ref{fig:single} shows a grid navigation task where the user navigates from \texttt{w1} by moving vertically and horizontally and \texttt{y3} contains a pit the user can not see.
 Thus, \mbox{$\mathrm{d}=$ \texttt{at(z3)}} and \mbox{$\mathrm{u}=$ \texttt{at(y3)}}. The user computes a satisficing plan for $\mathrm{d}$ and executes it by revealing one action at a time to the observer. A, B, C are all feasible from the user's perspective.
-However, the observer knows plans B and C unsafe.
-If the user presents actions \texttt{move(y2,y3)} or \texttt{move(x3,y3)} observer must flag them because they directly lead to $\mathrm{u}$ (i.e., late critical actions).
-If the user is executing an optimal plan, the observer can use early intervention. In this case, if the action \texttt{move(w2,w3)} is revealed, it must be flagged because the user can only move up to reach $\mathrm{d}$ (without violating optimality). Thus $\mathrm{u}$ becomes inevitable. Also, the actions \texttt{move(w3,x3)}, \texttt{move(x3,y3)} must also be flagged (i.e., a critical sequence). We formally define the terms \textit{critical action} and \textit{critical sequence} later.
+However, the observer knows plans B and C are unsafe.
+If the user presents actions \texttt{move(y2,y3)} or \texttt{move(x3,y3)} observer must flag them because they are direct contributors to $\mathrm{u}$.
+If the user is executing an optimal plan, the observer can flag indirect contributors to $\mathrm{u}$. In this case, if the action \texttt{move(w2,w3)} is revealed, it must be flagged because the user can only move up to reach $\mathrm{d}$ (without violating optimality). Thus $\mathrm{u}$ becomes inevitable. Also, \texttt{move(w3,x3)}, \texttt{move(x3,y3)} must be flagged. We formally define the terms \textit{directly contributing action} and \textit{indirectly contributing sequence} later.
 
-Interrupting presented actions that are not a critical action (or in the critical sequence) results in false alarms, which can annoy the user.
-We tune the intervention sensitivity; i.e., early vs. late using a set of intervention features defined in Section~\ref{sec:features}.
+Interrupting presented actions directly nor indirectly contributing to $\mathrm{u}$ results in false alarms.
+We tune the intervention sensitivity; i.e., direct vs. indirect using a set of intervention features defined in Section~\ref{sec:features}.
 But next we consider how to formulate intervention as an extension of plan recognition.
 
 \begin{figure}[ptb]
@@ -200,14 +197,12 @@ Our key insight is considering $\mathrm{u}$ as a ``goal'', which is justified fo
 Undesirable plans $\Pi_{\mathrm{u}}$ are plans that achieve $\mathrm{u}$ and desirable plans $\Pi_{\mathrm{d}}$ achieve $\mathrm{d}$. 
 Thus, the observer must consider the two states together $\mathcal{G}=\lbrace\mathrm{u} \cup \mathrm{d}\rbrace$
 The observer's recognition problem is: in domain $D$, given $O = \lbrace o_1, \ldots o_{i-1}\rbrace$, what is the most likely ``goal'' from $\mathcal{G}$ if $o_i$ will be observed? 
-When $\mathrm{u}$ and $\mathrm{d}$ are far apart, intervention is straightforward; when they are proximate, the observer may find it difficult to recognize $\mathrm{u}$. 
+When $\mathrm{u}$ and $\mathrm{d}$ are far apart, applying existing plan recognition algorithms should help the observer identify the most likely goal and intervene if $\mathrm{u}$ is most likely. When they are proximate, the observer may find it difficult to recognize $\mathrm{u}$. 
 
 
-Identifying critical actions requires that the observer consider all potential sources of damage to the user's planning problem, regardless the initial likelihood.
 In intervention, the observer asks the question: in domain $D$, given $O = \lbrace o_1, \ldots o_{i-1}\rbrace$ must $o_i \in O$ be flagged to prevent reaching $\mathrm{u}$ first?
-The observer makes this decision while observations arrive incrementally. 
-If we are to solve intervention as a plan recognition problem, we need to assume a prior probability distribution (e.g., uniform) over $\mathcal{G}$. However, assuming the distribution of $Pr$ apriori does not ensure that the false alarms will be minimized. Further, user's perspective, $\mathrm{d}$ is more likely while $\mathrm{u}$ is not and the observer may not be able to accurately estimate $Pr$.
-
+Note that $O\not\models\mathrm{u}$. 
+If we are to solve intervention as a plan recognition problem, we need to assume a prior probability distribution (e.g., uniform) over $\mathcal{G}$. However, assuming the distribution of $Pr$ apriori does not ensure that the false alarms will be minimized. 
 
 \theoremstyle{definition}
 \begin{definition}
@@ -218,23 +213,21 @@ $\mathrm{d}, \mathrm{u} \subseteq F$
 The user solves the planning problem $P_0=\langle F_0, A_0, I_0,\mathrm{d}\rangle$, where $F_0 \subset F$, $A_0\subseteq A$, $I_0 \subseteq I$ and $\mathrm{d}\subset F$. 
 Because $\mathrm{u}\subset F$, $\mathrm{u}\neq \mathrm{d}$ and $\mathrm{u}$ is hidden to the user, some solutions to $P_0$ become undesirable. Therefore, the observer can partition the solution space for $P_0$ to two disjoint plan sets: desirable ($\Pi_{\mathrm{d}}$), which do not contain actions that lead to $\mathrm{u}$ and undesirable ($\Pi_{\mathrm{u}}$). The user following his own plan may present actions to the observer from both $\Pi_{\mathrm{u}}$ and $\Pi_{\mathrm{d}}$. 
 
-A solution to $\mathcal{I}$ is a sequence of binary decisions that maps the observations $o_i\in O$ to $\lbrace Yes,No\rbrace$ indicating whether the observation requires intervention. For example, suppose in the Figure~\ref{fig:single} the user has decided to execute plan C $=\lbrace$ \texttt{move(w1,w2)}, \texttt{move(w2,w3)}, \texttt{move(w3,x3)}, \texttt{move(x3,y3)},$\ldots \rbrace$. When the user presents \texttt{move(w1,w2)} the observer flags it as $No$, when the user presents  \texttt{move(w2,w3)} the decision is $No$ and so on.
+A solution to $\mathcal{I}$ is a sequence of binary decisions that maps the action the user presents $o_i\in O$ to $\lbrace Yes,No\rbrace$ indicating whether it requires intervention. For example, suppose in Figure~\ref{fig:single} the user decides execute plan C $=\lbrace$ \texttt{move(w1,w2)}, \texttt{move(w2,w3)}, \texttt{move(w3,x3)}, \texttt{move(x3,y3)},$\ldots \rbrace$. When he presents \texttt{move(w1,w2)} it is flagged as $No$, when \texttt{move(w2,w3)} is presented, it flagged as $No$ and so on.
 
 
- The two flagging sensitivity levels (late vs. early) require different decision functions. 
-In this paper, we discuss the design of the decision function $\mathcal{F}$ that flags the latest (i.e., most critical) actions. Therefore, we define the critical action to only reflect what it means to be \textit{late}.
-\begin{definition}
-A \textnormal{late critical action} $a_{crit} \in O$ is an action that occurs in an undesirable plan $\pi_{\mathrm{u}}\in \Pi_{\mathrm{u}}$ and execution of $a_{crit}$ in state $s$ results in a state $s^\prime$ such that $s^\prime\models \mathrm{u}$.
-\end{definition}
-
-We use machine learning to derive functions that perform the mapping from observations to flagging decisions $\lbrace Yes, No\rbrace$. 
+We use machine learning to derive functions that perform the mapping from observations to flagging decisions $\lbrace Yes, No\rbrace$, for an application specific constant $\Theta\mapsto\lbrace$`direct',`indirect'$\rbrace$.
 The first method uses features derived from a data structure called an \textit{Intervention Graph}. 
-The second method uses plan distance metrics comparing distances between the user's projected plan and $\Pi_{\mathrm{u}}$ and $\Pi_{\mathrm{d}}$ as features.
-We define the intervention decision function $\mathcal{F}$, for an application specific constant $\Theta\mapsto\lbrace$`late',`early'$\rbrace$.
-\begin{definition}
-An \textnormal{intervention decision function} $\mathcal{F}$ takes as input, example critical actions (of some critical level $\Theta$) and a set of domain independent features (described next) corresponding to those critical actions and produces a learned model that can recognize critical actions of the same level $\Theta$ occurring in observations from a new planning instance.
-\end{definition}
+The second method uses plan distance metrics that compare distances between the user's projected plan to $\Pi_{\mathrm{u}}$ and $\Pi_{\mathrm{d}}$ as features.
 
+When $\Theta=direct$, we define the directly contributing action.
+\begin{definition}
+A \textnormal{directly contributing action} $a_{crit}$ occurs in an undesirable plan $\pi_{\mathrm{u}}\in \Pi_{\mathrm{u}}$ and execution of $a_{crit}$ in state $s$ results in a state $s^\prime$ such that $s^\prime\models \mathrm{u}$.
+\end{definition}
+\noindent When $\Theta=indirect$, we define an indirectly contributing sequence $q_{crit}$.
+\begin{definition}
+An \textnormal{indirectly contributing sequence} $q_{crit}$ is a totally ordered action sequence that starts with the presented action $o_i$ from in an undesirable plan $\pi_{\mathrm{u}}\in \Pi_{\mathrm{u}}$. Executing actions in $q_{crit}$ from state $s$ results in a state $s^\prime$ such that $s^\prime\models \mathrm{u}$.
+\end{definition}
 %=========================================================================
 %=========================================================================
 %===  example
@@ -253,27 +246,18 @@ Figure \ref{fig:multi} (top) shows a problem with 4 blocks (T, B, A, D) initiall
 $\mathrm{d}=\lbrace$(\texttt{CLEAR T})(\texttt{ON T A})(\texttt{ON A D})(\texttt{ONTABLE D})$\rbrace$(i.e., TAD) and $\mathrm{u}=\lbrace$(\texttt{CLEAR B})(\texttt{ON B A})(\texttt{ON A D})(\texttt{ONTABLE D})$\rbrace$ (i.e., BAD).
 The user does not know about the competitor's modifying the state of block B (dotted line block) nor about $\mathrm{u}$.
 Thus the user may enable $\mathrm{d}$ with the action \texttt{stack(user,A,D)} and at the same time creating an opportunity for the competitor to reach $\mathrm{u}$ first. 
-If the observer is intervening late ($\Theta=late$), $a_{crit}=\lbrace$\texttt{stack(competitor,B,A)}$\rbrace$. 
+$a_{crit}=\lbrace$\texttt{stack(competitor,B,A)}$\rbrace$. 
+$q_{crit}$=$\lbrace$\texttt{pickup(competitor,B)}, \texttt{stack(competitor,B,A)}$\rbrace$.
 
-
-When intervening early ($\Theta=early$), we define a critical sequence $s_{crit}$ that the observer must flag.
-\begin{definition}
-A \textnormal{critical sequence} $s_{crit} \subseteq O$ is a totally ordered set of actions in an undesirable plan $\pi_{\mathrm{u}}\in \Pi_{\mathrm{u}}$ and the execution of actions in $s_{crit}$ from state $s$ results in a state $s^\prime$ such that $s^\prime\models \mathrm{u}$.
-\end{definition}
-\noindent In Figure \ref{fig:multi} (top), $s_{crit}=\lbrace$\texttt{pickup(competitor,B)}, \texttt{stack(competitor,B,A)}$\rbrace$.
-Figure \ref{fig:multi}~(bottom) shows a problem with a longer $s_{crit}$.
-Here, $\mathrm{d}= $ (CUP) and $\mathrm{u}= $ (CUT) are defined the same way as the TAD/BAD example. The user does not observe block T, 
-and intervention must happen when \texttt{STACK(competitor, T, P)} is observed. If not, the user could unwittingly reach $\mathrm{u}$ by placing U on T (thinking P is free) and stacking C on U. 
-Thus, any subsequent action leading  to $\mathrm{u}$ must also be flagged to prevent the error. 
-Therefore, $s_{crit}=\lbrace$\texttt{stack(competitor,T,P)}, \texttt{pickup(user,U)},\texttt{stack(user,U,T)}, \texttt{pickup(user,C)},\texttt{stack(user,C,U)}$\rbrace$.
+In Figure \ref{fig:multi}~(bottom) $\mathrm{d}= $ (CUP) and $\mathrm{u}= $ (CUT) are defined the same way as the TAD/BAD example. Block T is hidden from the user. Intervention must happen when \texttt{STACK(competitor, T, P)} is observed. If not, the user could unwittingly reach $\mathrm{u}$ by placing U on T (thinking P is free) and stacking C on U. 
+Therefore, $q_{crit}=\lbrace$\texttt{stack(competitor,T,P)}, \texttt{pickup(user,U)},\texttt{stack(user,U,T)}, \texttt{pickup(user,C)},\texttt{stack(user,C,U)}$\rbrace$.
 
 \begin{figure}[t]
-          \centering{\includegraphics[width=0.8\columnwidth]{bw.pdf}}
+          \centering{\includegraphics[width=0.7\columnwidth]{bw.pdf}}
         \caption{Reaching $\mathrm{u}= $ (BAD) (top) and $\mathrm{u}= $ (CUT) (bottom) with an competitor and a user.  The table initially contains all four blocks in each example. A block in the user or competitor row indicates a pickup action that is removed using a stack action.}
         \label{fig:multi}
 \end{figure}
 
-%\debug{mak}{provide a new definition for this variant of the problem}
 \begin{definition}
 The \textnormal{online plan intervention problem} with a competitor is a tuple $\mathcal{I} = \langle D, O, \mathcal{G} \rangle$ where $D=\langle F_0\cup F_1, A_0\cup A_1, I \rangle$ is a planning domain, 
 $O$ is  sequence of observed actions, $\mathrm{d},\mathrm{u} \in \mathcal{G}$ and 
@@ -285,17 +269,17 @@ However, the competitor does not have access to all the actions needed to achiev
 Observations for $\mathcal{I}$, contain actions from $A_0$ and $A_1$.
 For example, in Figure \ref{fig:multi}(top), the competitor can only perform actions with the hidden block (stack B, pickup B etc.), and the user can not recognize effects of these \textit{hidden} actions. 
 
-The execution model of the agents is such that the user and the competitor (if present) take turns in presenting actions to the observer. Which agent presents his action first is decided randomly. Given an observation trace $O = \lbrace o_1, o_2,\ldots o_{i-1}\rbrace$, the observer sees the effects of the actions upto $o_{i-1}$. The user or the competitor (if present) presents the next action $a_i$ to execute from their respective action sets $A_0$ and $A_1$.
+Given an observation trace $O = \lbrace o_1, o_2,\ldots o_{i-1}\rbrace$, the observer sees the effects of the actions upto $o_{i-1}$. The user and the competitor (if present) take turns in presenting the next action $a_i$ to execute from their respective action sets $A_0$ and $A_1$. In each decision cycle, which agent presents his action first is decided randomly. The observer makes the intervention decision for the action and adds it as $o_{i}$.
 
-In this study, we make several assumptions about the observer.
+We make several assumptions.
 \textbf{(Observability)} 
-The observer has full observability, knows about both $\mathrm{d}$ and $\mathrm{u}$ and helps the user avoid $\mathrm{u}$ by flagging critical actions.
+The observer has full observability, knows about  $\mathrm{d}$ and $\mathrm{u}$ and helps the user avoid $\mathrm{u}$.
 \textbf{(Plans)} 
-The user follows a satisficing plan to reach $\mathrm{d}$, but may reach the hidden $\mathrm{u}$ unwittingly. 
-There is a satisficing plan to reach $\mathrm{u}$ and we assume that it has a common prefix with a plan to reach $\mathrm{d}$. In this work, we are only interested in correctly identifying actions that are in $a_{crit}$ and $s_{crit}$ for a given intervention problem. Therefore, we assume that  the user continues to present the observer with actions from his original plan even after the first positive flag. The user do not replan. We leave the problem of handling positive flags to future work.
-For now, the execution stops when either $\mathrm{u}$ or $\mathrm{d}$ is reached first.
+The user follows a satisficing plan to reach $\mathrm{d}$, but may reach $\mathrm{u}$ unwittingly. 
+There is a satisficing plan to reach $\mathrm{u}$ and we assume that it has a common prefix with a plan to reach $\mathrm{d}$. In this work, we are only interested in correctly identifying actions that are in $a_{crit}$ and $q_{crit}$ for a given intervention problem. Therefore, we assume that  the user continues to present the observer with actions from his original plan even after the first positive flag and does not replan. We leave the problem of handling positive flags to future work.
+Execution stops when either $\mathrm{u}$ or $\mathrm{d}$ is reached first.
 \textbf{(Competitor)}
-When present, the competitor only perform actions using objects hidden to the user; this restriction follows from many security domains where an attacker is a remote entity that plants traps and expects the user to become an unwitting accomplice (e.g., attacker sends click-bait phishing email to the user and expects the user to click the link).
+When present, the competitor only perform actions using objects hidden to the user; this restriction follows from many security domains where an attacker is a remote entity that plants traps and expects the user to become an unwitting accomplice (e.g., attacker sends click-bait phishing email to the user).
 
 
 
@@ -307,7 +291,7 @@ We define the intervention graph, which models the decision space of the observe
 We then extract several features from the  intervention graph, which we use to define $\mathcal{F}$.
 Unfortunately, extracting these features can be intractable when the graph is large, as can happen with larger problems, multiple paths reaching $\mathrm{d}$, or multiple undesirable goals. Therefore, we define an additional set of features by sampling the plan space, where the samples are obtained with the Top-K planner \cite{riabov2014}.
 
-The Intervention Graph allows the observer to evaluate how close in the state space the current projection of the observed partial plan is to $\mathrm{u}$. The Intervention Graph consists of alternating state and action layers where each state layer consists of predicates that have been made true by the actions in the previous layer. An action layer consists of actions $a\in A$ whose preconditions are satisfied in the state. Algorithm \ref{bsg} describes the process of building the Intervention Graph. The algorithm takes as input a domain theory $D$, state $s$ and $\mathcal{G}=\lbrace\mathrm{u},\mathrm{d}\rbrace$ (lines 1-2). Before any observations have been made, the current state (i.e., root of the tree) is set to initial state $I$. Next, using the domain theory $D$, actions  $a\in A$ whose preconditions are satisfied at current state are added to the graph (lines 5-6). Each action in level $i$ spawns possible states for level $i+1$. Line 7 ensures that the actions that immediately undoes the previous action are not added to the graph. This is because the user and the competitor (if present) in our domain are (bounded) rational agents and their respective action sets ($A_0$, $A_1$) are disjoint. For each resulting state a search node is created, with an edge representing the action responsible for the state transition (lines 8-10). Calling the method recursively for each open search node until $\mathrm{d}$ and $\mathrm{u}$ are added to the graph generates the plan hypotheses for the observer (line 11). To ensure that only realistic plans are explored, we do not add no-op actions to the action layers in the graph. As a new observation arrives, the root of the graph is changed to reflect the new state after the observation and subsequent layers are also modified to that effect.  
+The Intervention Graph allows the observer to evaluate how close the current projection of the observed partial plan is to $\mathrm{u}$. The Intervention Graph consists of alternating state and action layers where each state layer consists of predicates that have been made true by the actions in the previous layer. An action layer consists of actions $a\in A$ whose preconditions are satisfied in the state. Algorithm \ref{bsg} describes the process of building the Intervention Graph. The algorithm takes as input a domain theory $D$, state $s$ and $\mathcal{G}=\lbrace\mathrm{u},\mathrm{d}\rbrace$ (lines 1-2). Before any observations have been made, the current state (i.e., root of the tree) is set to initial state $I$. Next, using the domain theory $D$, actions  $a\in A$ whose preconditions are satisfied at current state are added to the graph (lines 5-6). Each action in level $i$ spawns possible states for level $i+1$. Line 7 ensures that the actions that immediately undoes the previous action are not added to the graph. This is because the user and the competitor (if present) in our domain are (bounded) rational agents and their respective action sets ($A_0$, $A_1$) are disjoint. For each resulting state a search node is created, with an edge representing the action responsible for the state transition (lines 8-10). Calling the method recursively for each open search node until $\mathrm{d}$ and $\mathrm{u}$ are added to the graph generates the plan hypotheses for the observer (line 11). To ensure that only realistic plans are explored, we do not add no-op actions to the action layers in the graph. As a new observation arrives, the root of the graph is changed to reflect the new state after the observation and subsequent layers are  modified to that effect.  
 %\debug{mak}{clarify how the IG is different from the actual RPG and discuss algorithm in detail. Alternatively, consider forgoing the link to the RPG and just discussing the IG in terms of the search space. }
 %\debug{sachini}{why does the IG need to explore longer plans that those that reach $G_d$.  Mak: Explore around the fringe because we don't know where $\mathrm{u}$ ``lives.''}
 \begin{algorithm}[tb]
@@ -346,24 +330,24 @@ The Intervention Graph is a weighted, single-root, directed acyclic connected gr
 %\end{figure}
 
 
-\section{Extracting Features From The Intervention Graph}
+\section{Extracting Intervention Graph Features}
 \label{sec:features}
-We extract a set of features from the intervention graph that help determine when to intervene. These features include: Risk, Desirability, Distance to $\mathrm{d}$, Distance to $\mathrm{u}$ and Percentage of active undesirable landmarks. To compute the landmark feature, we use the definition for landmarks by Hoffman et al. \shortcite{hoffman2004lm}, which are propositions that have to be true at some time in every solution plan in a planning problem. Formally: a fact $L_P \subset F$ of a planning task $ P = \langle F, A, I, G \rangle$ is a \textbf{fact landmark} for $P$ iff $L_P$ is true in some state in all valid plans that modifies $I$ to $G$. 
+We extract a set of features from the intervention graph that help determine when to intervene. These features include: Risk, Desirability, Distance to $\mathrm{d}$, Distance to $\mathrm{u}$ and Percentage of active undesirable landmarks. We use the definition for landmarks by Hoffman et al. \shortcite{hoffman2004lm}, which are propositions that have to be true at some time in every solution plan in a planning problem. Formally: a fact $L_P \subset F$ of a planning task $ P = \langle F, A, I, G \rangle$ is a \textbf{fact landmark} for $P$ iff $L_P$ is true in some state in all valid plans that modifies $I$ to $G$. 
 
-We use these features to train a classifier that learns to identify actions in $a_{crit}$ and $s_{crit}$. If the user or the competitor presents an action in either  of these sets, an intervention flag will be raised. Figure \ref{fig:feature} illustrates a fragment of the intervention graph from Figure \ref{fig:multi} (A) after the user presents the action \texttt{PICK-UP A}, which we will use as a running example to discuss feature computation.
+We use these features to train a classifier that learns to identify actions in $a_{crit}$ and $q_{crit}$. Figure \ref{fig:feature} illustrates a fragment of the intervention graph from Figure \ref{fig:multi} (top) after the user presents the action \texttt{PICK-UP A}, which we will use as a running example to discuss feature computation.
 
 \begin{figure*}[tb]
-        \centering{\includegraphics[width=0.75\textwidth]{features.pdf}}
-        \caption{Fragment of the decision space after PICKUP A has been observed for block-words example in Figure \ref{fig:multi} (A). Numbers under each state and action indicate the probability. Sub trees $T_1$ and $T_2$ are not expanded for simplicity.}
+        \centering{\includegraphics[width=0.5\textwidth]{features.pdf}}
+        \caption{Fragment of the decision space after PICKUP A has been observed for block-words example in Figure \ref{fig:multi} (top). Numbers under each state and action indicate the probability. Sub trees $T_1$ and $T_2$ are not expanded for simplicity.}
         \label{fig:feature}
 \end{figure*} 
 
-\textbf{Risk ($R$)} quantifies how likely the presented action will lead to $\mathrm{u}$. $R$ is also coupled with the uncertainty the observer has about what the next action the user or the competitor (if present) will present. We model the uncertainty as a uniform probability distribution across the set of actions whose preconditions are satisfied in current state. We define $R$ as the posterior probability of reaching $\mathrm{u}$ while the user is trying to achieve $\mathrm{d}$. We extract plans from the intervention graph from the root to any leaf containing the $\mathrm{d}$, including the plans in which the user has been subverted to reach $\mathrm{u}$ instead. By virtue of construction termination, $\mathrm{d}$ will always be a leaf.
+\textbf{Risk ($R$)} quantifies the probability that the presented action will lead to $\mathrm{u}$. $R$ is also coupled with the uncertainty the observer has about what the next action the user or the competitor (if present) will present. We model the uncertainty as a uniform probability distribution across the set of actions whose preconditions are satisfied in current state. We define $R$ as the posterior probability of reaching $\mathrm{u}$ while the user is trying to achieve $\mathrm{d}$. We extract plans from the intervention graph from the root to any leaf containing the $\mathrm{d}$, including the plans in which the user has been subverted to reach $\mathrm{u}$ instead. By construction, $\mathrm{d}$ will always be a leaf.
 Let $\Pi_{\mathcal{C}}$ be the candidate plans reaching $\mathrm{d}$ and let $\left | \Pi_{\mathcal{C}} \right |=n$. The plan set $\Pi_{u}$ contains action sequences that reach state $\mathrm{u}$ such that, $\Pi_{u} \subseteq \Pi_{\mathcal{C}}$, $\left | \Pi_{u} \right |=m$ and $(m<=n)$. We compute posterior probability of reaching $\mathrm{u}$ for a path $\pi \in \Pi_{u}$, using chain rule in probability as, $P_{\pi}=\prod_{j=1}^{k}P(\alpha_j|\alpha_1, \alpha_2,...,\alpha_{k-1})$, and $\alpha_{j} \in A$ and $k$ is the length of path until $\mathrm{u}$ is reached. Then: 
 \begin{equation*} 
 R = \left\{\begin{matrix} \frac{\sum_{i=1}^{m}P_{\pi_i}}{m} & m>0\\ 0 &  m=0 \end{matrix}\right.
 \end{equation*}
-According to the example in Figure \ref{fig:feature}, $(n=6)$ and $(m=1)$. Since we assumed full observability for the observer, the root of the tree (current state) is assigned the probability of 1.0. Then, actions that are immediately possible after the current state are each assigned probabilities following a uniform distribution across the branching factor (0.33). Then for each applicable action in the current state, the resulting state gets the probability of ($1.0\times0.33=0.33$). Similarly, we apply the chain rule of probability for each following state and action level in the graph until $\mathrm{u}$ first appears in the path. $R=\frac{0.08}{1}=0.08$.
+In Figure \ref{fig:feature}, $(n=6)$ and $(m=1)$. Since we assumed full observability for the observer, the root of the tree (current state) is assigned the probability of 1.0. Actions that are immediately possible after the current state are each assigned probabilities following a uniform distribution across the branching factor (0.33). Then for each applicable action in the current state, the resulting state gets the probability of ($1.0\times0.33=0.33$). Similarly, we apply the chain rule of probability for each following state and action level in the graph until $\mathrm{u}$ first appears in the path. $R=\frac{0.08}{1}=0.08$.
 
 \textbf{Desirability ($D$)} measures the effect of the observed action to help the user pursue the desirable goal safely. Given $\Pi_{\mathcal{C}}$ as the set of plans extracted from the intervention graph that reach $\mathrm{d}$ and $\left | \Pi_{\mathcal{C}} \right |=n$. The plan set $\Pi_{d}$ contains action sequences that reach state $\mathrm{d}$ without reaching $\mathrm{u}$, $\Pi_{d} = \Pi_{\mathcal{C}} \setminus \Pi_{u} $, we compute  posterior probability of reaching $\mathrm{d}$ without reaching $\mathrm{u}$ for a path $\pi \in \Pi_{d}$, using chain rule in probability as, $P_{\pi}=\prod_{j=1}^{k}P(\alpha_j|\alpha_1, \alpha_2,...,\alpha_{k-1})$, and $\alpha_{j} \in A$ and $k$ is the length of path. Then:
 \begin{equation*} 
@@ -375,7 +359,7 @@ D = \left\{\begin{matrix}
 In Figure \ref{fig:feature}, there are five instances where user achieved $\mathrm{d}$  without reaching $\mathrm{u}$ (two in sub tree $T_1$, three in the expanded branch). Following the same approach to assign probabilities for states and actions, $D= \frac{(0.08+0.08+0.08+0.04+0.04)}{5} = 0.07$.
 $R$ and $D$ are based on probabilities indicating the confidence the observer has about the next observation. We also use simple distance measures: (1) distance to $\mathrm{u}$  ($\delta_u$) and (2) distance to $\mathrm{d}$ ($\delta_d$). Both distances are measured in the number of actions required to reach a state containing $\mathrm{d}$ or $\mathrm{u}$ from root in the intervention graph.  
 
-\textbf{Distance to $\boldsymbol{\mathrm{u}}$} ($\delta_u$) measures the distance to state $\mathrm{u}$ from the current state in terms of the number of actions. $\Pi_{\mathcal{C}}$ is the set of paths extracted from the intervention graph that reach $\mathrm{d}$ and $\left | \Pi_{\mathcal{C}} \right |=n$. The path set $\Pi_{u}$ contains action sequences that reach state $\mathrm{u}$ such that, $\Pi_{u} \subseteq \Pi_{\mathcal{C}}$, $\left | \Pi_{u} \right |=m$ and $(m<=n)$. We count  $s$, the number of the edges (actions) before $\mathrm{u}$ is reached for each path $\pi \in \Pi_{u}$ and $\delta_u$ is defined as the average of the distance values given by the formula:
+\textbf{Distance to $\boldsymbol{\mathrm{u}}$} ($\delta_u$) measures the distance to state $\mathrm{u}$ from the current state in terms of the number of actions. $\Pi_{\mathcal{C}}$ is the set of paths extracted from the intervention graph that reach $\mathrm{d}$ and $\left | \Pi_{\mathcal{C}} \right |=n$. The path set $\Pi_{u}$ contains action sequences that reach state $\mathrm{u}$ such that, $\Pi_{u} \subseteq \Pi_{\mathcal{C}}$, $\left | \Pi_{u} \right |=m$ and $(m<=n)$. We count  $s$, the number of the edges (actions) before $\mathrm{u}$ is reached for each path $\pi \in \Pi_{u}$ and $\delta_u$ is defined as the average of the distance values:
 \begin{equation*} 
 \delta_u = \left\{\begin{matrix}
 \frac{\sum_{i=1}^{m}s_i}{m} & m>0\\ 
@@ -396,72 +380,77 @@ In this formula, $-1$ indicates that $\mathrm{d}$ can not be reached safely from
 
 
 \textbf{Percentage of active attack landmarks} ($\mathcal{L}_{ac}$) captures the criticality of the current state toward contributing to $\mathrm{u}$. 
-Landmarks \cite{hoffman2004lm} are predicates (or actions) that must be true in every valid plan for a planning problem. We used the algorithm in Hoffmann et al. \shortcite{hoffman2004lm} to extract fact landmarks for the planning problem $P = \langle D, \mathrm{u}\rangle$. These landmarks are referred to as attack landmarks ($\mathcal{L}_{u}$) because they establish predicates that must be true to reach $\mathrm{u}$.  Landmarks have been successfully used in deriving heuristics in plan recognition \cite{vered2018goalrec} and generating alternative plans \cite{bryce2014diverse}. We compute a feature using attack landmarks: percentage of active attack landmarks in the current state ($\mathcal{L}_{ac}$). To compute $\mathcal{L}_{ac}$ for the example in Figure \ref{fig:feature}, we count the number of landmark predicates that have become active $(l)$ in the root of the intervention graph. Then, ($\mathcal{L}_{ac}$) is given by the formula: $\mathcal{L}_{ac} = \frac{l}{\left |\mathcal{L}_{u}\right|}$. In Figure \ref{fig:feature}, $l=4$ and $\mathcal{L}_{ac}=4/10=0.4$.
+Landmarks \cite{hoffman2004lm} are predicates (or actions) that must be true in every valid plan for a planning problem. We used the algorithm in Hoffmann et al. \shortcite{hoffman2004lm} to extract fact landmarks for the planning problem $P = \langle D, \mathrm{u}\rangle$. These landmarks are referred to as attack landmarks ($\mathcal{L}_{u}$) because they establish predicates that must be true to reach $\mathrm{u}$.  Landmarks have been successfully used in deriving heuristics in plan recognition \cite{vered2018goalrec} and generating alternative plans \cite{bryce2014diverse}. We compute the percentage of active attack landmarks in the current state ($\mathcal{L}_{ac}$). To compute $\mathcal{L}_{ac}$ in Figure \ref{fig:feature}, we count the number of landmark predicates that have become active $(l)$ in the root of the intervention graph. Then, ($\mathcal{L}_{ac}$) is given by the formula: $\mathcal{L}_{ac} = \frac{l}{\left |\mathcal{L}_{u}\right|}$. In Figure \ref{fig:feature}, $l=4$ and $\mathcal{L}_{ac}=4/10=0.4$.
 
-Algorithm~\ref{alg:exact} shows the computation of the feature values for a given observation using the intervention graph. The algorithm takes a PDDL domain, a set of undesirable and desirable states as input and produces a relation $\mathcal{V}$ of observations and corresponding feature values. Landmarks for the problem $P = \langle D, \mathrm{u}\rangle$ are computed apriori (line 3). Then, as observations are revealed incrementally, the intervention graph is generated and the feature set is computed (lines 4-11). Finally, the state is updated to reflect the effect of the most recent observation (line 12).
+For each presented action, the intervention graph is generated and features are computed, producing the corresponding feature vector for the presented action. Landmarks for the problem $P = \langle D, \mathrm{u}\rangle$ are computed apriori. 
 
 \section{Sampling the Intervention Graph}
-To overcome the state space explosion while building the graph in large domains, we propose a second method. Instead of finding plans from the full search space, the observer samples only a subset of plans to compute a new feature vector called Sampled Features. Here, we estimate the Risk and Desirability using plan distance measures. The intuition is that if the user is executing an unsafe plan, then will be more similar to a sample of unsafe plans, compared to a sample of safe plans. 
+To overcome the state space explosion in large domains, we propose a second method. Instead of finding plans from the full search space, the observer samples only a subset of plans to compute a new feature vector called Sampled Features. Here, we estimate the Risk and Desirability using plan distance measures. If the user is executing an unsafe plan, then that plan should be more similar to a sample of unsafe plans, compared to a sample of safe plans. 
 
-We use action set distance, state sequence distance, causal link distance \cite{nguyen2012generating}, Generalized Edit Similarity (GED) for sequences of states and actions \cite{sohrabi2016finding} from the plan diversity literature as replacements for Risk and Desirability. We also use Landmark-Based Goal Completion Heuristic \cite{pereira2017} and the number of actions to $\mathrm{u}$ and $\mathrm{d}$ as additional features.
+The observer computes plan distances between a reference plan ($\pi^\prime$) and sampled plans ($\Pi^{\prime\prime}$) for both $\mathrm{u}$ and $\mathrm{d}$ for each presented action. 
+%We borrow from plan recognition to produce $\pi^\prime$ and $\Pi^{\prime\prime}$ that agree with the observation history ($O$). Ramirez and Geffener \shortcite{ramirez2009plan} proposed an approach to compile the observations into the domain theory. Vered et al. \shortcite{vered2016mirror} proposed goal mirroring that concatenates a plan prefix, which agrees with the observations to a plan suffix, which is a plan generated from the last observed point in the prefix to the goal, that can be applied to both continuous and discrete domains.
+ We follow the method proposed by Vered et al. \shortcite{vered2016mirror} to generate the observation compatible plan by concatenating the observation history with the optimal plan that reaches $\mathrm{u}$ (and $\mathrm{d}$) to produce $\pi^\prime$. 
+ %Generating observation compatible $\pi^\prime$ and $\Pi^{\prime\prime}$ by compiling the observations into the domain theory is a possible future extension to this work. 
+ We use the Top-K planner with K$=$50 \cite{riabov2014}, to sample the plan space.
+We use action set distance (ACD), state sequence distance (SSD), causal link distance (CLD) \cite{nguyen2012generating}, Generalized Edit Similarity (GED) for sequences of states and actions \cite{sohrabi2016finding} as to measure the distance. When an action is presented to the observer, $\pi^\prime$ is computed. Then, observation compatible Top-K plans are produced for $\mathrm{u}$ and $\mathrm{d}$ separately. Then we compute the medians of ACD, CLD and SSD, minimum remaining actions to $\mathrm{u}$ and $\mathrm{d}$, minimum action GED and state GED are computed for $\mathrm{u}$ and $\mathrm{d}$ for all $\langle$reference, sample$\rangle$ pairs. This produces the Sampled Feature vector for the presented action.
 
-The observer computes plan distances between a reference plan ($\pi^\prime$) and sampled plans ($\Pi^{\prime\prime}$) for both $\mathrm{u}$ and $\mathrm{d}$ for each presented action. We borrow from plan/goal recognition to produce $\pi^\prime$ and $\Pi^{\prime\prime}$ that agree with the observation history ($O$). Ramirez and Geffener \shortcite{ramirez2009plan} proposed an approach to compile the observations into the domain theory. Vered et al. \shortcite{vered2016mirror} proposed goal mirroring that concatenates a plan prefix, which agrees with the observations to a plan suffix, which is a plan generated from the last observed point in the prefix to the goal, that can be applied to both continuous and discrete domains. We follow the method proposed by Vered et al. \shortcite{vered2016mirror} in this work to generate the observation compatible plans. We concatenate observation history with the optimal plan that reaches $\mathrm{u}$ (and $\mathrm{d}$) to produce $\pi^\prime$. Generating observation compatible $\pi^\prime$ and $\Pi^{\prime\prime}$ by compiling the observations into the domain theory is a possible future extension to this work. We use the Top-K planner with K$=$50 \cite{riabov2014}, to sample the plan space. Algorithm \ref{alg:apx} computes the feature vector from sampling the plan space. For action, state sequence and causal link distances we use the median of all $\langle$reference, sample$\rangle$ plan pairs as the feature value. We use the minimum distance to goal state for all $\langle$reference, sample $\rangle$ pairs. For action and state GED, we use the minimum for all $\langle$reference, sample$\rangle$ pairs.
-\vspace{-2mm}
-\begin{algorithm}[tb]
-%\scriptsize
-        \caption{Build Full Vectors}
-        \label{alg:exact}
-        \begin{algorithmic}[1]
-                \Require $D$, $I$, $O$, $\mathrm{u}$, $\mathrm{d}$.
-                \Procedure{Full}{$D,O,I,\mathrm{u},\mathrm{d}$}
-                \State $i=0;$ $ s_i \gets I$
-                \State $\mathcal{L}_{u} \gets$ compute remaining landmarks for the problem $P_\alpha=\langle D_\alpha, \mathrm{u}\rangle$
-                \For{$o \in O$}
-                        \State $G(V,E) \gets ExpandGraph(D,s_i,\mathrm{u},\mathrm{d})$
-                        \State $R_o \gets$ compute $Risk$ using $IG$
-                        \State $D_o \gets$ compute $Desirability$ using $IG$
-                        \State $\delta_{u_o} \gets$ compute mean distance to critical state using $IG$
-                        \State $\delta_{d_o} \gets$ compute mean distance to desirable state using $IG$
-                        \State $\mathcal{L}_{{ac}_o} \gets$ active landmark \% using $s_i$ and  $\mathcal{L}_{u}$
-                        \State $\mathcal{V}(o) \gets \lbrack R_o,D_o,\delta_{u_o}, \delta_{d_o}, \mathcal{L}_{{ac}_o}\rbrack$
-                        \State {$s_{i+1} \gets ((s_{i} \setminus Del(o))\cup Add(o))$}
-                \EndFor
-                \EndProcedure
-        \end{algorithmic}
-\end{algorithm}
-\setlength{\textfloatsep}{2pt}
-\begin{algorithm}[tb]
-%\scriptsize
-        \caption{Build Sampled Vector}
-        \label{alg:apx}
-        \begin{algorithmic}[1]
-                \Require $D$, $s$, $\mathrm{u}$, $\mathrm{d}$
-                \State $i=0;$ $ s_{i} \gets I $
-                \State $prefix,suffix,\Pi^{\prime\prime}, \mathcal{V} \gets \varnothing$
-                \Procedure{Partial}{$D,s,\mathrm{u},\mathrm{d},O$}
-                        \State $\mathcal{L}_{u} \gets$ compute remaining landmarks for the problem $P_\alpha=\langle D_\alpha, \mathrm{u}\rangle$
-                \For{$o \in O$}
-                        \State \parbox[t]{0.95\linewidth}{$prefix \gets prefix + o$}
-                        \State \parbox[t]{0.95\linewidth} 
-                                {$s_{i+1} \gets ((s_{i} \setminus Del(o))\cup Add(o))$}
-                        \For {$ g \in \{\mathrm{u}, \mathrm{d}$\}}
-                                \State \parbox[t]{0.95\linewidth}{$suffix \gets OptimalPlan(s,g)$}
-                                \State \parbox[t]{0.95\linewidth}{$\Pi^\prime \gets prefix + suffix$}
-                                \State \parbox[t]{0.95\linewidth}{$\Pi^{\prime\prime} \gets \text{Observation compatible Top-K plans for } g$}
-                                \State \parbox[t]{0.95\linewidth}{$v_1 \gets$ MedianActionSetDist$(\Pi^\prime, \Pi^{\prime\prime})$}
-                                \State \parbox[t]{0.95\linewidth}{$v_2 \gets$ MedianCausalLinkDist$(\Pi^\prime, \Pi^{\prime\prime})$}
-                                \State \parbox[t]{0.95\linewidth}{$v_3 \gets$ MedianStateSequenceDist$(\Pi^\prime,\Pi^{\prime\prime})$}
-                                \State \parbox[t]{0.95\linewidth}{$v_4 \gets$ MinimumDistToState $(g,\Pi^{\prime\prime})$}
-                                \State \parbox[t]{0.95\linewidth}{$v_5 \gets$ MinimumActionGED $(\Pi^\prime, \Pi^{\prime\prime})$}
-                                \State \parbox[t]{0.95\linewidth}{$v_6 \gets$ MinimumStateGED $(\Pi^\prime, \Pi^{\prime\prime})$}
-                                \State $\mathcal{V}(o) \gets \lbrack v_1,v_2,v_3,v_4,v_5,v_6\rbrack $
-                        \EndFor
-                        \State \parbox[t]{0.95\linewidth}{$v_7 \gets$ AchievedLandmarkHeuristic $(\mathrm{u},s_{i})$}
-                        \State $\mathcal{V}(o) \gets \mathcal{V}(o)+\{v_7\}$
-                \EndFor
-                \EndProcedure
-        \end{algorithmic}
-\end{algorithm}
+
+%\vspace{-2mm}
+%\begin{algorithm}[tb]
+%%\scriptsize
+%        \caption{Build Full Vectors}
+%        \label{alg:exact}
+%        \begin{algorithmic}[1]
+%                \Require $D$, $I$, $O$, $\mathrm{u}$, $\mathrm{d}$.
+%                \Procedure{Full}{$D,O,I,\mathrm{u},\mathrm{d}$}
+%                \State $i=0;$ $ s_i \gets I$
+%                \State $\mathcal{L}_{u} \gets$ compute remaining landmarks for the problem $P_\alpha=\langle D_\alpha, \mathrm{u}\rangle$
+%                \For{$o \in O$}
+%                        \State $G(V,E) \gets ExpandGraph(D,s_i,\mathrm{u},\mathrm{d})$
+%                        \State $R_o \gets$ compute $Risk$ using $IG$
+%                        \State $D_o \gets$ compute $Desirability$ using $IG$
+%                        \State $\delta_{u_o} \gets$ compute mean distance to critical state using $IG$
+%                        \State $\delta_{d_o} \gets$ compute mean distance to desirable state using $IG$
+%                        \State $\mathcal{L}_{{ac}_o} \gets$ active landmark \% using $s_i$ and  $\mathcal{L}_{u}$
+%                        \State $\mathcal{V}(o) \gets \lbrack R_o,D_o,\delta_{u_o}, \delta_{d_o}, \mathcal{L}_{{ac}_o}\rbrack$
+%                        \State {$s_{i+1} \gets ((s_{i} \setminus Del(o))\cup Add(o))$}
+%                \EndFor
+%                \EndProcedure
+%        \end{algorithmic}
+%\end{algorithm}
+%\setlength{\textfloatsep}{2pt}
+%\begin{algorithm}[tb]
+%%\scriptsize
+%        \caption{Build Sampled Vector}
+%        \label{alg:apx}
+%        \begin{algorithmic}[1]
+%                \Require $D$, $s$, $\mathrm{u}$, $\mathrm{d}$
+%                \State $i=0;$ $ s_{i} \gets I $
+%                \State $prefix,suffix,\Pi^{\prime\prime}, \mathcal{V} \gets \varnothing$
+%                \Procedure{Partial}{$D,s,\mathrm{u},\mathrm{d},O$}
+%                        \State $\mathcal{L}_{u} \gets$ compute remaining landmarks for the problem $P_\alpha=\langle D_\alpha, \mathrm{u}\rangle$
+%                \For{$o \in O$}
+%                        \State \parbox[t]{0.95\linewidth}{$prefix \gets prefix + o$}
+%                        \State \parbox[t]{0.95\linewidth} 
+%                                {$s_{i+1} \gets ((s_{i} \setminus Del(o))\cup Add(o))$}
+%                        \For {$ g \in \{\mathrm{u}, \mathrm{d}$\}}
+%                                \State \parbox[t]{0.95\linewidth}{$suffix \gets OptimalPlan(s,g)$}
+%                                \State \parbox[t]{0.95\linewidth}{$\Pi^\prime \gets prefix + suffix$}
+%                                \State \parbox[t]{0.95\linewidth}{$\Pi^{\prime\prime} \gets \text{Observation compatible Top-K plans for } g$}
+%                                \State \parbox[t]{0.95\linewidth}{$v_1 \gets$ MedianActionSetDist$(\Pi^\prime, \Pi^{\prime\prime})$}
+%                                \State \parbox[t]{0.95\linewidth}{$v_2 \gets$ MedianCausalLinkDist$(\Pi^\prime, \Pi^{\prime\prime})$}
+%                                \State \parbox[t]{0.95\linewidth}{$v_3 \gets$ MedianStateSequenceDist$(\Pi^\prime,\Pi^{\prime\prime})$}
+%                                \State \parbox[t]{0.95\linewidth}{$v_4 \gets$ MinimumDistToState $(g,\Pi^{\prime\prime})$}
+%                                \State \parbox[t]{0.95\linewidth}{$v_5 \gets$ MinimumActionGED $(\Pi^\prime, \Pi^{\prime\prime})$}
+%                                \State \parbox[t]{0.95\linewidth}{$v_6 \gets$ MinimumStateGED $(\Pi^\prime, \Pi^{\prime\prime})$}
+%                                \State $\mathcal{V}(o) \gets \lbrack v_1,v_2,v_3,v_4,v_5,v_6\rbrack $
+%                        \EndFor
+%                        \State \parbox[t]{0.95\linewidth}{$v_7 \gets$ AchievedLandmarkHeuristic $(\mathrm{u},s_{i})$}
+%                        \State $\mathcal{V}(o) \gets \mathcal{V}(o)+\{v_7\}$
+%                \EndFor
+%                \EndProcedure
+%        \end{algorithmic}
+%\end{algorithm}
 
 %=========================================================================
 %=========================================================================
@@ -469,12 +458,12 @@ The observer computes plan distances between a reference plan ($\pi^\prime$) and
 %=========================================================================
 %=========================================================================
 \section{Learning When to Intervene}
-The observer is learning to flag actions in $a_{crit}$ or $s_{crit}$.
-We train a classifier in supervised learning mode to categorize observed actions into two classes: (Y) indicating intervention is required and (N), indicating otherwise. Given a observations labeled as Y/N and corresponding feature vectors, we train the classifiers with 10-fold cross validation. Then the trained model is used to predict intervention for previously unseen, new intervention problems. We chose Naive Bayes, K-nearest neighbors, decision tree and logistic regression classifiers from Weka~\footnote{\url{http://www.cs.waikato.ac.nz/ml/weka/}}. Attribute selected classifiers filter the feature vector to only select critical features. This step reduces complexity of the model, makes the outcome of the model easier to interpret, and reduces over-fitting. We selected these classifiers because they are commonly used interpretable models, which we hope to utilize in generating explanations for intervention in future work.
+We train a classifier to categorize the presented action into two classes: (Y) indicating intervention is required and (N), indicating otherwise. Given a observations labeled as Y/N and corresponding feature vectors, we train the classifiers with 10-fold cross validation. The trained model is used to predict intervention for previously unseen intervention problems. We chose Naive Bayes, K-nearest neighbors, decision tree and logistic regression classifiers from Weka~\footnote{\url{http://www.cs.waikato.ac.nz/ml/weka/}}. Attribute selected classifiers filter the feature vector to only select critical features. This step reduces complexity of the model, makes the outcome of the model easier to interpret, and reduces over-fitting.
+% We selected these classifiers because they are commonly used interpretable models, which we hope to utilize in generating explanations for intervention in future work.
 
 We generated training data from twenty intervention problems using the benchmark domains. Additionally, we created a new planning domain for the Rush Hour puzzle. In this puzzle, user moves vehicle objects on a grid to clear a path for a target vehicle to move to the exit located on the perimeter of the grid. We created training data from twenty Rush Hour puzzles. We restricted the number of observation traces per intervention problem to 100.
  
-A full parameter search revealed the best parameters for the classifiers. The decision tree classifier is tuned to pruning confidence=0.25 and minimum number of instance per leaf=2. K-nearest neighbor classifier is tuned to use k=1 and distance measure=Euclidean. Logistic regression classifier is tuned for ridge parameter = 1.0E-8. Naive Bayes classifier is tuned with the supervised discretization=True. For the intervention graph approach, the learned models chose distance to $\mathrm{u}$ and Risk as the dominant features for the benchmark domains. We were not able to identify clear dominant features in feature vectors built with plan space sampling.
+A full parameter search revealed the best parameters for the classifiers. The decision tree classifier is tuned to pruning confidence=0.25 and minimum number of instance per leaf=2. K-nearest neighbor classifier is tuned to use k=1 and distance measure=Euclidean. The logistic regression classifier is tuned for ridge parameter = 1.0E-8. Naive Bayes classifier is tuned with the supervised discretization=True. For the intervention graph approach, the learned models chose distance to $\mathrm{u}$ and Risk as the dominant features for the benchmark domains. %We were not able to identify clear dominant features in feature vectors built with plan space sampling.
 
 %ran experiments using the Weka workbench to evaluate classifier accuracy (dependent variable) to varying parameter for the classifiers (independent variables). Table \ref{tab:tuned} summarizes results, with boldface values indicating the selected parameter values that produced best accuracy (95\% confidence interval) for all the domains.
 %\begin{table}[ht]
@@ -498,11 +487,11 @@ A full parameter search revealed the best parameters for the classifiers. The de
 %=========================================================================
 %=========================================================================
 \section{Results and Discussion}
-We focus on two questions: (1) Using domain-independent features indicative of the likelihood to reach $\mathrm{u}$ from current state, can the observer correctly interrupt to prevent the user from reaching $\mathrm{u}$? and (2) How does the learning approach perform against state-of the-art goal recognition? To address the first question, we evaluated the performance of the learned model to predict intervention on previously unseen problems.
+We focus on two questions: (1) Using domain-independent features indicative of the likelihood to reach $\mathrm{u}$ from current state, can the observer correctly interrupt to prevent the user from reaching $\mathrm{u}$? and (2) How does the learning approach perform against state-of the-art goal recognition? To address the first question, we evaluated the performance of the learned model on unseen problems.
 
-The benchmark suite consists of Blocks-words, IPC Grid, Navigator and Ferry domains and the Generalized Rush Hour domain. For the \textbf{Blocks-words} domain, we chose word building problems. The words user and the competitor want to build are different but they have some common letters. The competitor is able to exploit the user's progress using a hidden block in the domain. In the \textbf{IPC grid} domain, the user agent moves through a grid to get from point A to B. Certain locked positions on the grid can be opened by picking up keys. In the \textbf{Navigator} domain, the user agent simply moves from one point in grid to another. In IPC Grid and Navigator domains, we designated certain locations on the grid as traps. The goal of the user is to navigate to a specific point on the grid without passing through the trap. In the \textbf{Ferry} domain, a single ferry moves cars between different locations. We assigned a port as \emph{compromised}. The ferry's objective is to transport cars to specified locations without passing the compromised port. In the \textbf{Rush Hour} domain, we created puzzles on arbitrary grid sizes and exits. The player wins by moving a target car to the exit. We also designated some vehicles on the grid as forbidden. The forbidden vehicles need not be moved to solve the puzzle. Any user action that moves any of the forbidden vehicles raises the intervention flag.
+The benchmark suite consists of Blocks-words, IPC Grid, Navigator and Ferry domains and the Generalized Rush Hour domain. For the \textbf{Blocks-words} domain, we chose word building problems. The words user and the competitor want to build are different but they have some common letters. In the \textbf{IPC grid} domain, the user agent moves through a grid to get from point A to B. Certain locked positions on the grid can be opened by picking up keys. In the \textbf{Navigator} domain, the user agent moves from one point in grid to another. In IPC Grid and Navigator domains, we designated certain locations on the grid as traps. The goal of the user is to navigate to a specific point on the grid without passing through the trap. In the \textbf{Ferry} domain, a single ferry moves cars between different locations. We assigned a port as \emph{compromised}. The ferry's objective is to transport cars to specified locations without passing the compromised port. In the \textbf{Rush Hour} domain, we created puzzles on arbitrary grid sizes and exits. The player wins by moving a target car to the exit. We also designated some vehicles on the grid as forbidden. The forbidden vehicles need not be moved to solve the puzzle. Any user action that moves any of the forbidden vehicles raises the intervention flag.
 
-We generate 3 separate test instances of 20 problems each (total of 60) for the benchmark domains containing problems different from trained instances. For example, number of blocks in the domain (block-words), size of grid (navigator, easy-ipc), number of cars and exit locations (Rush Hour), accessible and inaccessible paths on the grid (navigator, easy-ipc), properties of artifacts in the grid (easy-ipc). For each problem in an instance we generated 10 observation traces (total of 600 test observation traces). For the Rush Hour domain we created 2200 observation traces and split to training and testing 60/40. We define true-positive as the classifier correctly identifying the presented action as action that must be in $a_{crit}$ or $s_{crit}$. True-negative is an instance where the classifier  correctly identifying an action as not belonging to $a_{crit}$ or $s_{crit}$. False-positives are instances where classifier incorrectly identifies an action as belonging to $a_{crit}$ or $s_{crit}$. False-negatives are instances where the classifier incorrectly identifies the presented action as not belonging to $a_{crit}$ or $s_{crit}$. Naturally, our test observation traces contain a large number of negatives. To offset the bias introduced to the classifier by the class imbalance, we report Matthews correlation coefficient (MCC) because it gives an accurate measure the quality of a binary classification while taking into account the different class sizes. We also report the F-score $= \frac{tp}{tp+1/2(fp+fn)}$ for the classifier. $tp$, $fp$, $fn$ refer to the number of true positives, false positives and false negatives respectively.
+We generate 3 separate test instances of 20 problems each (total of 60) for the benchmark domains with problems different from training instances. For example, number of blocks in the blocks words domain, size of grid (navigator, IPC-Grid), number of cars and exit locations  in Rush Hour domain, accessible and inaccessible paths on the grid (navigator, IPC-Grid), properties of artifacts in the grid (IPC-Grid). For each problem in test instance we generated 10 observation traces (total of 600 test observation traces). For the Rush Hour domain we created 2200 observation traces and split to training and testing 60/40. We define true-positive as the classifier correctly identifying the presented action as action that must be in $a_{crit}$ or $q_{crit}$. True-negative is an instance where the classifier  correctly identifying an action as not belonging to $a_{crit}$ or $q_{crit}$. False-positives are instances where classifier incorrectly identifies an action as belonging to $a_{crit}$ or $q_{crit}$. False-negatives are instances where the classifier incorrectly identifies the presented action as not belonging to $a_{crit}$ or $q_{crit}$. Naturally, our test observation traces contain a large number of negatives. To offset the bias introduced to the classifier by the class imbalance, we report Matthews correlation coefficient (MCC) because it gives an accurate measure the quality of a binary classification while taking into account the different class sizes. We also report the F-score $= \frac{tp}{tp+1/2(fp+fn)}$ for the classifiers. $tp$, $fp$, $fn$ are the number of true positives, false positives and false negatives respectively.
 
 
 \begin{table*}[tb]
@@ -546,15 +535,15 @@ We generate 3 separate test instances of 20 problems each (total of 60) for the 
 \label{tab:rgv}
 \end{table*}
 
-To test what existing goal recognition algorithms can recognize the user's goal in time and accurately, we implemented Ramirez and Geffener's probabilistic plan recognition algorithm \cite{ramirez2010probabilistic} and the Goal Recognition with Goal Mirroring algorithm by Vered et al. \shortcite{vered2018goalrec}. The solutions for both approaches produce a probability distribution over the set of goals ($\mathrm{u}$ and $\mathrm{d}$). Vered et al. first prune the goal hypotheses using landmarks and then rank the remaining goals. As each observation is made available incrementally, the observer repeatedly solves a goal recognition problem using each approach. We assumed uniform priors for the goal hypotheses. If $\mathrm{u}$ is the top ranked goal when an actual unsafe action observed, intervention will be triggered (true positive). We used the same test data suite to evaluate accuracy.
+We implemented three state-of-the art plan recognition algorithms to compare intervention accuracy to the proposed learning based solution. We selected Ramirez and Geffener's probabilistic plan recognition algorithm \cite{ramirez2010probabilistic} (both the satisficing, and optimal implementations) and the Goal Recognition with Goal Mirroring algorithm by Vered et al. \shortcite{vered2018goalrec}. 
+For each presented action, the observer solves a plan recognition problem using each approach. We assumed uniform priors for over $\mathrm{u}$ and $\mathrm{d}$. If $\mathrm{u}$ is the top ranked goal for the presented action, then it is flagged as requiring intervention. The assumption is that these algorithms must also be able to correctly identify $\mathrm{u}$ as most likely goal for the actions in $a_{crit}$ and $q_{crit}$. We used the same test data suite to evaluate accuracy.
 
 Table \ref{tab:exactapprox} shows that the classifiers trained with features from the intervention graph achieve high accuracy for all the domains when predicting intervention. The MCC value shows that the class size does not bias the classifier. Low false positives and false negatives suggests that the user will not be unnecessarily interrupted. As expected performance degrades when we use a sampled plan space to derive features. For the benchmark domains we were able to discover at least one classifier responded with very high F-score the plan similarity features, the exception being the Ferry domain. The Rush Hour domain produced comparatively better results, with the decision tree and K-Nearest neighbor classifiers being the best. 
 
-Features derived from the intervention graph accurately separate actions where the user has limited/no options available to reach the desirable goal while avoiding the undesirable state. Thus the classifiers perform well in recognizing critical actions in new problems. The sampled features rely on the learning algorithm to produce better output when predicting intervention. 
+Features derived from the intervention graph accurately separate actions where the user has limited options available to reach the desirable goal while avoiding the undesirable state. Thus the classifiers perform well in recognizing critical actions in new problems. The sampled features rely on the learning algorithm to produce better output when predicting intervention. 
 
-Comparing with results in Table \ref{tab:rgv}, we see that learning methods outperform existing plan recognition algorithms when predicting intervention. The algorithms we selected clearly struggled to predict intervention in the Navigator domain. 
-
-These results suggest that although we can adopt existing plan recognition algorithms to identify when the user needs intervention, it also produces a lot of false negatives and false positives in correctly identifying which state (desirable/undesirable) is most likely given the observations. The learning approach is better suited for intervention because it allows us to target specific critical observations and allow the user some freedom.
+Comparing results in Table \ref{tab:rgv}, learning methods outperform existing plan recognition algorithms when predicting intervention. The algorithms we selected clearly struggled to predict intervention in the Navigator domain. 
+These results suggest that although we can adopt existing plan recognition algorithms to identify when the user needs intervention, it also produces a lot of false negatives and false positives in correctly identifying which state (desirable/undesirable) is most likely given the observations. The learning approach is better suited for intervention because the observer can target specific critical actions and allow the user some freedom.
 
 %=========================================================================
 %=========================================================================
@@ -563,13 +552,13 @@ These results suggest that although we can adopt existing plan recognition algor
 %=========================================================================
 \section{Related Work}
 \label{sec:relatedwork}
-Closely related areas of literature for this work include plan and goal recognition. Plan recognition is the problem of inferring the course of action (i.e., plan) an actor may take towards achieving a goal from a sequence of observations \cite{schmidt1978plan,kautz1986generalized}. The constructed plan, if followed to completion, is expected to result in states that correspond to goals of the actor, which in turn presupposes that the actor intends to achieve those goals. 
-Plan/goal recognition approaches in the literature explore both domain-dependent and independent methods. In domain-dependent methods, agents rely heavily on domain knowledge for inference. For example, Kabanza et al. \shortcite{kabanza2010rts}  presents a solution that recognizes an agent’s adversarial intent by mapping observations made to date to a plan library. Boddy et al. \shortcite{boddy2005course} discuss how to construct and manipulate domain models that describe behaviors of adversaries in computer security domain and use these models to generate plans. Another approach uses Goal Driven Autonomy (GDA) that allows agents to continuously monitor the current plan’s execution and assess if the current state matches with expectation (Klenk et al.2013)\nocite{aha2013gda}. Geib et al. \shortcite{geib2001hostile} extended plan recognition to handle hostile agents. As observations appear, possible execution traces for unobserved actions are constructed using a plan graph. The reconstructed execution traces are then used to infer a probability distribution over the goal hypotheses.
+Plan recognition is the problem of inferring the course of action (i.e., plan) an actor may take towards achieving a goal from a sequence of observations \cite{schmidt1978plan,kautz1986generalized}. The constructed plan is expected to result in states that correspond to goals of the actor, which in turn presupposes that the actor intends to achieve those goals. 
+In domain-dependent methods, agents rely heavily on domain knowledge for inference. Kabanza et al. \shortcite{kabanza2010rts}  presents a solution that recognizes an agent’s adversarial intent by mapping observations made to date to a plan library. Boddy et al. \shortcite{boddy2005course} discuss construction and manipulation of domain models that describe behaviors of adversaries in computer security domain and use these models to generate plans. Goal Driven Autonomy (GDA) that allows agents to continuously monitor the current plan’s execution and assess if the current state matches with expectation (Klenk et al.2013)\nocite{aha2013gda}. Geib et al. \shortcite{geib2001hostile} extended plan recognition to handle hostile agents.
 
-Other work attempts to separate knowledge dependency by allowing the agent to learn from observations (Jaidee et al. 2001)\nocite{jaidee2011gda}. In contrast, domain-independent goal recognition uses planning to infer agent’s goals. Ramirez and Geffner \shortcite{ramirez2009plan,ramirez2010probabilistic} used an existing planner to generate hypotheses from observations to infer a single agent's plan. Their approaches offer advantages of being more adaptive to input as well as exploiting existing planning systems and plan representations. Their first approach computed the set of goals that can be achieved by optimal plans that match the observations. The second approach removed the optimality constraint and computed a probability distribution across likely goals. \cite{ramirez2010probabilistic}. Keren et al. \shortcite{keren2014grd} introduced the worst-case distinctiveness (wcd) metric as a measurement of the ease of performing goal recognition design (GRD) in a domain. The wcd problem finds the longest sequence of actions an agent can execute while hiding its goal. They show that by limiting the set of available actions in the model that wcd can be minimized, which will allow the agent to reveal it's goal as early as possible. A key difference between intervention and GRD is that the observer intervenes to change the user's behavior and in GRD there is no direct interaction.
+Domain-independent goal recognition uses planning to infer agent’s goals. Ramirez and Geffner \shortcite{ramirez2009plan,ramirez2010probabilistic} used an existing planner to generate hypotheses from observations to infer a single agent's plan. Their approaches offer advantages of being more adaptive to input as well as exploiting existing planning systems and plan representations. Their first approach computed the set of goals that can be achieved by optimal plans that match the observations. The second approach removed the optimality constraint and computed a probability distribution across likely goals. \cite{ramirez2010probabilistic}. Keren et al. \shortcite{keren2014grd} introduced the worst-case distinctiveness (WCD) metric as a measurement of the ease goal recognition in a domain. By limiting the set of available actions in the model,  WCD can be minimized, allowing the agent to reveal it's goal early.
 
 
-Landmarks are used in recognition to minimize the number of hypotheses the agent has to evaluate, thus improving the efficiency. Pozanco et al. \shortcite{pozanco2018counterplanning} combines probabilistic plan recognition and landmarks to counter plan and block an opponent's goal achievement. This is approach uses offline recognition where all observations are made available apriori. In plan recognition, identifying the plan at the right time is not a priority. In intervention this is critical because we want to reduce false alarms and misses. Our approach complements (and improves) existing recognition methods by using classifiers to recognize intervention and identifying salient features that may be useful in generating explanations for intervention.
+Landmarks are used in recognition to minimize the number of hypotheses the agent has to evaluate. Pozanco et al. \shortcite{pozanco2018counterplanning} combines probabilistic plan recognition and landmarks to counter plan and block an opponent's goal achievement. This is approach uses offline recognition. In plan recognition, identifying the plan at the right time is not a priority. In intervention this is critical because we want to reduce false alarms and misses. Our approach complements (and improves) existing recognition methods by using classifiers to recognize intervention.
 
 %=========================================================================
 %=========================================================================
@@ -578,7 +567,7 @@ Landmarks are used in recognition to minimize the number of hypotheses the agent
 %=========================================================================
 \section{Conclusion}
 When agents work in environments with hidden information, their plans can go wrong.
-We formalized the online plan intervention problem to recognize when plans will not achieve the intended goal. We proposed two learned models that use features extracted from the intervention graph and the sampled plan space to identify critical actions and critical sequences, which if not intervened will cause the user agent's plan to fail. We evaluated how commonly accepted interpretable classifiers perform in predicting intervention. The learning approach outperforms existing online plan recognition approaches in predicting intervention with lower false positives and false negatives. Future work will address how the observer can further help the user post-intervention with replanning or suggesting helpful actions.
+We formalized the online plan intervention problem to recognize when plans will not achieve the intended goal. We proposed two learned models that use features extracted from the intervention graph and the sampled plan space to identify critical actions and critical sequences, which if not intervened will cause the user agent's plan to fail. We evaluated how existing classifiers perform in predicting intervention. The learning approach outperforms existing online plan recognition approaches in predicting intervention with lower false positives and false negatives. %Future work will address how the observer can further help the user post-intervention with replanning or suggesting helpful actions.
 %\section*{Acknowledgments}
 %We thank the anonymous reviewers for comments that helped improve the paper. The authors also thank AFOSR and NRL for funding this research.
 \clearpage %leave this here to ensure that the final page renders consistently
