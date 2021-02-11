@@ -1,0 +1,16 @@
+\begin{frame}{Inferring an Agent's Goal}
+\textit{Given the three moves (up,up,diagonal) from I to F, is the actor's plan likely to reach A or B}?\\
+
+Find the cost difference between:
+\begin{itemize}
+\item A plan going to the goal that includes the observations $(G|O)$
+\item A plan going to the goal that does not include the observations $(G|\overline{\rm O})$
+\end{itemize}
+
+\begin{figure}[!ht]
+  \centering
+	\includegraphics[width=0.7\textwidth]{img/rg.png}
+\end{figure}
+Cost difference A $>$ cost difference B $\rightarrow$ likely goal B
+
+\end{frame}

@@ -1,0 +1,21 @@
+\begin{frame}{Generating Plans Compatible with Observations}
+\begin{itemize}
+\item Compiling observations away
+\begin{itemize}
+\item For every observation add a new operator and predicates to the planning domain definition\\
+
+\textbf{operator:} $\texttt{ob}_{\texttt{move}(L5\_3, L4\_3)}$\\
+\textbf{preconditions:} $\lbrace$ (\texttt{at}$\:L5\_3$) $\land$  (\texttt{adj}$\:\:L5\_3$,$\:L4\_3$) $\rbrace$ \\
+\textbf{postconditions:} $\lbrace$ $\neg$ (\texttt{at}$\:L5\_3$) $\land $ (\texttt{at}$\:L4\_3$) $\land$ $\texttt{p}_{\texttt{move}(L5\_3, L4\_3)}$ $\rbrace$\\
+
+\item Forces the planner to find solutions that includes observations
+\end{itemize}
+
+\item Goal mirroring
+\begin{itemize}
+\item Rank goals by $score(g) = \frac{cost(i_g)}{cost(m_g)}$
+\item $cost(i_g)=$ optimal plan to achieve g
+\item $cost(m_g)=$ optimal plan that achieves g and includes all the observations
+\end{itemize}
+\end{itemize}
+\end{frame}

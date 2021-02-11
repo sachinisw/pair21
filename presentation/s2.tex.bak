@@ -1,0 +1,6 @@
+\begin{frame}{Rush Hour in STRIPS - Next State}
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=\columnwidth, keepaspectratio=true]{img/s2.png}
+\end{figure}
+\end{frame}

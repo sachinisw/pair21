@@ -1,0 +1,14 @@
+
+\begin{frame}{Research Question: How to identify the salient characteristics for deciding to intervene?}
+\begin{itemize}
+	\item Compare solutions that contain undesirable moves and solutions that do not.
+
+	\item Two sources of extracting characteristics:
+	\begin{itemize}
+		\item Intervention Graph
+		\item Plans sampled from the plan space
+	\end{itemize}
+	
+\end{itemize}
+
+\end{frame}

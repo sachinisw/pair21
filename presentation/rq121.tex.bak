@@ -1,0 +1,12 @@
+\begin{frame}{Key Findings}
+\begin{itemize}
+\item Huge enthusiasm for puzzle solving tasks (78\%)
+\item If stuck 47\% liked some tip to get past it. 15\% wanted a warning. 8\% wanted a warning and an explanation to help prevent getting stuck in the future
+\item 49\% moved the forbidden vehicle
+\end{itemize}
+\begin{figure}[htb]
+  \centering
+\includegraphics[width=0.5\columnwidth]{img/p2.png}
+  \caption{Percentage split between unsafe and safe solutions produced by human users for puzzles P1 through P10}
+\end{figure}
+\end{frame}

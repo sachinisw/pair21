@@ -1,0 +1,9 @@
+\begin{frame}{RQ2: Expected Findings}
+\begin{itemize}
+\item What were the most frequently used hints in different stages of the problem?
+\item What is the effect of hints on solution length
+\item What hints helped move the user closer to the optimal solution?
+\item Did the hints help the user avoid the forbidden vehicle?
+\end{itemize}
+
+\end{frame}

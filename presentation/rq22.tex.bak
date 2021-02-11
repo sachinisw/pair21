@@ -1,0 +1,10 @@
+\begin{frame}{EXTRA: Rush Hour Puzzle Human Subject Experiment Phase 2 Protocol}
+\begin{itemize}
+\item In Web-based puzzle simulator app, subjects solve one randomly assigned Rush Hour puzzle
+\item Subjects are told the puzzle has one forbidden vehicle that must not be moved
+\item The learned model displays hints for the subject to select
+\item If the forbidden vehicle is moved the move is  automatically undone
+\item Post study survey for demographics and helpful ratings for hints
+\end{itemize}
+
+\end{frame}

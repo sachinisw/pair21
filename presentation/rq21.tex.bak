@@ -1,0 +1,23 @@
+\begin{frame}{Research Question 1: \\ Characteristics from Human User Behavior}
+\begin{itemize}
+\item Use the proposed behavior features to produce classifiers to recognize an unsafe move
+\begin{itemize}
+\item One step before it happens
+\item Two steps before it happens
+\item Three steps before it happens
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Research Question 2: \\ Help Task Continuation Following Intervention}
+\begin{itemize}
+\item Use hints to guide the user toward the safe solution
+\begin{itemize}
+\item Next best move
+\item Number of remaining moves
+\item Vehicles that must be moved
+\item Restart
+\item Ignore hints
+\end{itemize}
+\end{itemize}
+\end{frame}

@@ -1,0 +1,7 @@
+\begin{frame}{The Tale of Two Domains}
+	\begin{figure}[t]
+	\centering{\includegraphics[width=4.5 in]{img/characteristics.png}}
+	\label{fig:scenario}
+\end{figure}
+
+\end{frame}

@@ -1,0 +1,23 @@
+\begin{frame}{Classifier Performance}
+Reporting F-score  $= \frac{TP}{TP + 1/2(FP+FN)}$ \\ Matthews Correlation Coefficient (MCC)
+\begin{itemize}
+\item Planning domains: BlocksWorld, EasyIPC, Ferry, Navigator, RushHour
+\item Classifiers with Intervention Graph features
+\begin{itemize}
+\item High accuracy (F-Score, MCC $>$87\%) for all domains
+\item Uniform high accuracy across different classifiers
+\end{itemize}
+\item Classifiers with plan distance metrics
+\begin{itemize}
+\item Accuracy varies for different types of classifiers for each domain
+\item Blocksworld problems - \textbf{K-nearest neighbor}
+\item EasyIPC/Navigator problems -\textbf{Naive Bayes}
+\item Rush Hour problems -\textbf{Decision Tree, K-nearest neighbor}
+\item Lowest accuracy for Ferry domain problems
+\end{itemize}
+\end{itemize}
+
+
+
+
+\end{frame}

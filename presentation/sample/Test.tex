@@ -1,0 +1,87 @@
+\documentclass{beamer}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{alltt}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{multirow}
+\usepackage{tabularx}
+
+
+\usetheme{beaver}
+\setbeamertemplate{footline}[frame number]{}
+\setbeamertemplate{navigation symbols}{}
+
+\AtBeginSection{\frame{\sectionpage}}
+\AtBeginSubsection{\frame{\subsectionpage}}
+
+\defbeamertemplate{section page}{mine}[1][]{%
+  \begin{centering}
+    {\usebeamerfont{section name}\usebeamercolor[fg]{section name}#1}
+    \vskip1em\par
+    \begin{beamercolorbox}[sep=12pt,center]{part title}
+      \usebeamerfont{section title}\insertsection\par
+    \end{beamercolorbox}
+  \end{centering}
+}
+
+\defbeamertemplate{subsection page}{mine}[1][]{%
+  \begin{centering}
+    {\usebeamerfont{subsection name}\usebeamercolor[fg]{subsection name}#1}
+    \vskip1em\par
+    \begin{beamercolorbox}[sep=8pt,center,#1]{part title}
+      \usebeamerfont{subsection title}\insertsubsection\par
+    \end{beamercolorbox}
+  \end{centering}
+}
+
+%template for Q&A slide
+\defbeamertemplate{section page}{questions}[1][]{%
+	\begin{centering}
+		{\usebeamerfont{section name}\usebeamercolor[fg]{section name}#1}
+		\vskip1em\par
+		\begin{beamercolorbox}[sep=12pt,center]{part title}
+			\usebeamerfont{section title}\insertsection\par
+		\end{beamercolorbox}
+	\end{centering}
+}
+
+
+%%%%%%%%%%%%%%%%%%%
+%SLIDE 1/2
+%%%%%%%%%%%%%%%%%%%
+
+\title{Domain-independent Plan Intervention}
+\author{Sachini Weerawardhana, Darrell Whitley, Mark Roberts}
+\institute{AAAI/Plan, Activity and Intention Recognition (PAIR) Workshop}
+\date{February, 9, 2021}
+\begin{document}
+
+%\maketitle
+\begin{frame}[plain]
+ \titlepage
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%
+%SLIDE 2/2
+%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Why Intervene?}
+	\begin{itemize}
+		\item A human user is doing something online that may have an undesirable outcome
+		\item Two sub-problems:
+		\begin{itemize}
+		\item Recognize what the user is doing is ``bad''
+		\item Help the user decide what to do next
+		\end{itemize}
+		\item \textbf{Use automated planning as a framework to model and understand}:
+		\begin{itemize}
+		\item Human user behavior in cyber-security
+		\item Problem solving in the Rush Hour puzzle
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+
+\end{document}

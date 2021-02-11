@@ -1,0 +1,10 @@
+\begin{frame}{Unhelpful Plan Prefix Recognition - Intervention Graph}
+\begin{itemize}
+\item Produce the intervention graph from current state (root) to $\mathrm{u}=$(BRAND) and $\mathrm{d}=$(BAND)
+\end{itemize}
+
+\begin{figure}[tb]
+        \centering{\includegraphics[width=\columnwidth]{img/BRAND_BAND.pdf}}
+\end{figure} 
+
+\end{frame}

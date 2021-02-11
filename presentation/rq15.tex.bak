@@ -1,0 +1,7 @@
+\begin{frame}{Algorithm 1: Intervention by Unhelpful Plan Prefix Recognition}
+Two agents: one actor and one observer
+\begin{figure}[!ht]
+  \centering
+\includegraphics[width=1.1\columnwidth]{img/grid.png}
+\end{figure}
+\end{frame}

@@ -1,0 +1,17 @@
+\begin{frame}{The Main Takeaway}
+\begin{itemize}
+\item The problem
+\begin{itemize}
+\item An agent is executing a plan online (user)
+\item The environment has some conditions that may allow the user's plan to be subverted (e.g., hidden information, an attacker)
+\item A passive observer monitoring the agent(s) actions must recognize in advance the user's plan will have an undesirable outcome
+\end{itemize}
+
+\item Research contribution
+\begin{itemize}
+\item Use characteristics of the planning problem representation to learn when intervention is required
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+

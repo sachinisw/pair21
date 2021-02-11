@@ -1,0 +1,19 @@
+\begin{frame}{Unhelpful Plan Prefix Recognition - Sampling the Plan Space}
+\begin{itemize}
+\item Instead of computing exact distances and probabilities compute an \textbf{estimated proximity to $\mathrm{d}$ and $\mathrm{u}$}
+\item Use an automated planner to find two solution sets for $\langle M, \mathrm{d}\rangle$ and  $\langle M, \mathrm{u}\rangle$
+\item Compute a \textit{reference plan} $= \lbrace observations + \pi^*\rbrace$, 
+\begin{itemize}
+\item $\pi^*$ - cost optimal plan from the current state to the goal for $\mathrm{d}$
+\end{itemize}
+\item Compute the ``distances'' between the \textit{reference plan} and the two solution sets
+
+
+\begin{itemize}
+\item Is the reference plan more similar to sampled $\mathrm{d}$ plans or $\mathrm{u}$ plans?
+\item plan distance metrics: action set distance, causal link distance, state sequence distance, edit distance.
+\end{itemize}
+
+\end{itemize}
+
+\end{frame}

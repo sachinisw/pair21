@@ -1,0 +1,28 @@
+\begin{frame}{Undesirable States: Benchmark Planning Domains}
+
+Blocks Words
+\begin{figure}[ht]
+  \centering
+\includegraphics[width=0.7\columnwidth]{img/blocks.png}
+\end{figure}
+
+EasyIPC
+\begin{figure}[ht]
+  \centering
+\includegraphics[width=0.5\columnwidth]{img/ipc.png}
+\end{figure}
+\end{frame}
+
+
+
+
+
+\begin{frame}{Undesirable States: Benchmark Planning Domains}
+Ferry
+\begin{figure}[ht]
+  \centering
+\includegraphics[width=0.5\columnwidth]{img/ferry.png}
+\end{figure}
+\end{frame}
+
+

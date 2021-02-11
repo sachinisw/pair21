@@ -1,0 +1,25 @@
+\begin{frame}{Intervention with Existing Goal Recognition Algorithms}
+\begin{itemize}
+\item Use \textbf{plan recognition as planning} and \textbf{goal mirroring} to recognize likely goals given observations
+\item If the likely goal is $\mathrm{u}$, then intervene
+\item Results
+\begin{itemize}
+\item Reporting F-score and Matthews Correlation Coefficient (MCC) for benchmark planning domains (Blocks words, EasyIPC, Ferry)
+\item Many false negatives/positives occur when the undesirable state is close to the desirable state in the state space.
+\item Low accuracy in recognizing when intervention is required
+\end{itemize}
+\end{itemize}
+
+%\begin{table}[]
+%\resizebox{\textwidth}{!}{%
+%\begin{tabular}{|l|l|l|l|l|l|l|}
+%\hline
+%\multirow{2}{*}{Domain} & \multicolumn{2}{c|}{\begin{tabular}[c]{@{}c@{}}Compiling Observations Away\\ (LAMA)\end{tabular}} & \multicolumn{2}{c|}{\begin{tabular}[c]{@{}c@{}}Compiling Observations Away \\ (HSP)\end{tabular}} & \multicolumn{2}{l|}{Goal Mirroring} \\ \cline{2-7} 
+% & \multicolumn{1}{c|}{F-score} & \multicolumn{1}{c|}{MCC} & \multicolumn{1}{c|}{F-score} & \multicolumn{1}{c|}{MCC} & \multicolumn{1}{c|}{F-score} & \multicolumn{1}{c|}{MCC} \\ \hline
+%\textbf{Blocks} & 0.38 & 0.45 & 0.38 & 0.45 & 0.36 & 0.43 \\ \hline
+%\textbf{EasyIPC} & 0.13 & 0.05 & 0.13 & 0.05 & 0.13 & 0.05 \\ \hline
+%\textbf{Ferry} & 0.17 & 0.18 & 0.22 & 0.2 & 0.10 & 0.08 \\ \hline
+%\end{tabular}%
+%}
+%\end{table}
+\end{frame}
